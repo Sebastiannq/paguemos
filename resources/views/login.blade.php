@@ -12,7 +12,7 @@
         
         <div class="relative z-10 flex flex-col justify-center p-12 lg:p-16">
             <h1 class="text-6xl lg:text-7xl font-black leading-tight mb-6">
-                <span class="text-white">PAGUEloca</span>
+                <span class="text-white">PAGUE Carabbana</span>
                 <br>
                 <span class="bg-gradient-to-r from-pink-400 to-pink-600 bg-clip-text text-transparent">MENOS</span>
             </h1>
