@@ -1,0 +1,116 @@
+body {
+    font-family: 'Poppins', sans-serif;
+    background: url('/img/fondo.jpg') no-repeat center center fixed;
+    background-size: cover;
+    padding-top: 55px;
+}
+
+
+body::before {
+    content: "";
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: -1;
+}
+.estilo-bienvenida {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.bienvenida-texto {
+    color: white;
+    font-weight: bold;
+    background: rgba(255,255,255,0.2);
+    padding: 6px 12px;
+    border-radius: 20px;
+}
+
+
+.navbar-principal {
+    background: rgba(0, 100, 0, 0.7);
+    backdrop-filter: blur(10px);
+}
+.nav-link {
+    color: white !important;
+    margin: 0 10px;
+}
+.boton-logout {
+    border-radius: 20px;
+    padding: 5px 15px;
+}
+.logo-navbar {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+.logo-navbar {
+    width: 60px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.hero-eventos {
+     position: relative;
+    background: url('Fotos/aniamles/mascota_2.jpg') center/cover no-repeat;
+    height: 580px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hero-eventos::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+}
+
+.hero-texto {
+    position: relative;
+    color: white;
+    text-align: center;
+}
+
+.card-evento {
+    border-radius: 20px;
+    overflow: hidden;
+    transition: 0.3s;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+.card-evento img {
+    height: 200px;
+    object-fit: cover;
+}
+.card-evento img {
+    height: 200px;
+    object-fit: cover;
+}
+
+.card-evento:hover {
+    transform: translateY(-5px);
+}
+
+
+.btn-custom {
+    border-radius: 20px;
+}
+
+.suscripcion {
+    background: rgba(255,255,255,0.9);
+    padding: 40px;
+    border-radius: 15px;
+}
+.separador-footer {
+    margin-bottom: 80px;
+}
+
+
+.footer-principal {
+    background: rgba(0,0,0,0.9);
+}
