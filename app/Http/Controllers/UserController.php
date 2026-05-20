@@ -4,57 +4,66 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-
     public function index()
     {
-        if(session('rol') != 'admin'){
+        // Seguridad por sesión (mantiene tu lógica original)
+        if(session('rol') != 'admin' && session('rol') != 'administrador'){
             return redirect('/');
         }
 
+        // Trae todos los registros de la tabla 'usuario'
         $usuarios = User::all();
 
-        return view('admin', compact('usuarios'));
+        // Retorna la nueva vista dentro de la carpeta admin
+        return view('admin.usuarios', compact('usuarios'));
     }
 
-    public function show($id)
+    public function store(Request $request)
     {
-        $usuario = User::findOrFail($id);
+        User::create([
+            'primer_nom'    => $request->primer_nom,
+            'segund_nom'    => $request->segund_nom,
+            'primer_apelli' => $request->primer_apelli,
+            'segund_apelli' => $request->segund_apelli,
+            'correo'        => $request->correo,
+            'contrasena'    => Hash::make($request->contrasena),
+            'estado'        => $request->estado,
+            'fecha_ingreso' => now()
+        ]);
 
-        return view('show', compact('usuario'));
-    }
-
-    public function edit($id)
-    {
-        $usuario = User::findOrFail($id);
-
-        return view('edit', compact('usuario'));
+        return redirect()->route('usuarios.index')->with('success', 'Usuario registrado exitosamente.');
     }
 
     public function update(Request $request, $id)
     {
         $usuario = User::findOrFail($id);
 
-        $usuario->name = $request->name;
-
-        $usuario->email = $request->email;
-
-        $usuario->rol = $request->rol;
+        $usuario->primer_nom    = $request->primer_nom;
+        $usuario->segund_nom    = $request->segund_nom;
+        $usuario->primer_apelli = $request->primer_apelli;
+        $usuario->segund_apelli = $request->segund_apelli;
+        $usuario->correo        = $request->correo;
+        $usuario->estado        = $request->estado;
+        
+        // Solo actualiza la contraseña si se escribe algo en el campo
+        if ($request->filled('contrasena')) {
+            $usuario->contrasena = Hash::make($request->contrasena);
+        }
 
         $usuario->save();
 
-        return redirect('/admin');
+        return redirect()->route('usuarios.index')->with('success', 'Usuario actualizado correctamente.');
     }
 
     public function destroy($id)
     {
         $usuario = User::findOrFail($id);
-
         $usuario->delete();
 
-        return redirect('/admin');
+        return redirect()->route('usuarios.index')->with('success', 'Usuario eliminado de la base de datos.');
     }
-
 }

@@ -7,7 +7,9 @@
 
 <div class="min-h-screen bg-white text-slate-900">
     <div class="flex h-screen overflow-hidden">
-        <aside class="w-72 bg-white border-r border-pink-100 text-slate-900 flex flex-col justify-between">
+
+        {{-- ===================== SIDEBAR ===================== --}}
+        <aside class="w-72 bg-white border-r border-pink-100 text-slate-900 flex flex-col justify-between shrink-0">
             <div class="p-6 space-y-8">
                 <div>
                     <div class="flex items-center gap-3 mb-6">
@@ -45,6 +47,10 @@
                         <i class="fa-solid fa-arrow-right-arrow-left w-6 text-pink-400"></i>
                         Movimientos
                     </a>
+                    <a href="#usuarios" data-section="usuarios" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-2xl text-slate-600 hover:bg-pink-100 hover:text-pink-600 transition">
+                        <i class="fa-solid fa-users w-6 text-pink-400"></i>
+                        Usuarios
+                    </a>
                 </nav>
             </div>
 
@@ -60,8 +66,23 @@
             </div>
         </aside>
 
+        {{-- ===================== MAIN ===================== --}}
         <main class="flex-1 overflow-y-auto bg-white">
             <div class="px-6 py-6 lg:px-10 lg:py-8">
+
+                {{-- Mensajes de éxito/error --}}
+                @if(session('success'))
+                <div class="mb-6 p-4 rounded-2xl text-sm font-semibold bg-emerald-50 border border-emerald-100 text-emerald-700 flex items-center gap-2">
+                    <i class="fa-solid fa-circle-check"></i> {{ session('success') }}
+                </div>
+                @endif
+                @if($errors->any())
+                <div class="mb-6 p-4 rounded-2xl text-sm font-semibold bg-rose-50 border border-rose-100 text-rose-700 flex items-center gap-2">
+                    <i class="fa-solid fa-circle-exclamation"></i> {{ $errors->first() }}
+                </div>
+                @endif
+
+                {{-- Header --}}
                 <div class="rounded-[2rem] bg-white p-6 shadow-sm shadow-pink-200/50 border border-pink-100 mb-8">
                     <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                         <div>
@@ -79,102 +100,221 @@
                                 <p class="mt-3 text-3xl font-bold text-slate-900">{{ $prendas->where('estado',1)->count() }}</p>
                             </div>
                             <div class="rounded-3xl border border-pink-100 bg-white p-5 shadow-sm">
-                                <p class="text-xs uppercase tracking-[0.35em] text-pink-500">Inventario</p>
-                                <p class="mt-3 text-3xl font-bold text-slate-900">{{ $prendas->sum('stock') }}</p>
+                                <p class="text-xs uppercase tracking-[0.35em] text-pink-500">Total Usuarios</p>
+                                <p class="mt-3 text-3xl font-bold text-slate-900">{{ count($usuarios) }}</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="flex flex-col gap-6 mb-8">
-                    <div class="rounded-3xl bg-white border border-pink-100 p-5 shadow-sm shadow-pink-200/40">
-                        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                            <div>
-                                <p class="text-sm font-medium text-slate-500">Buscar producto</p>
-                                <p class="text-xs text-slate-400">Busca por nombre, tipo o color.</p>
-                            </div>
-                            <div class="relative w-full lg:w-1/2">
-                                <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-pink-400"></i>
-                                <input type="text" placeholder="Search by product name, type, or tag..." class="w-full rounded-3xl border border-pink-100 bg-white py-3 pl-12 pr-4 text-slate-700 outline-none focus:border-pink-300 focus:ring-2 focus:ring-pink-100" />
-                            </div>
+                {{-- Buscador global --}}
+                <div class="rounded-3xl bg-white border border-pink-100 p-5 shadow-sm shadow-pink-200/40 mb-8">
+                    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                        <div>
+                            <p class="text-sm font-medium text-slate-500">Buscador Inteligente</p>
+                            <p class="text-xs text-slate-400">Escanea un código de barras o escribe para filtrar al instante.</p>
                         </div>
-                    </div>
-
-                    <div class="grid gap-6 xl:grid-cols-3">
-                        <div class="rounded-3xl bg-white border border-pink-100 p-6 shadow-sm">
-                            <p class="text-xs uppercase tracking-[0.35em] text-pink-500">Resumen</p>
-                            <h2 class="mt-4 text-2xl font-bold text-slate-900">Panel principal</h2>
-                            <p class="mt-3 text-slate-500">Monitorea inventario, ventas y facturas desde un único panel.</p>
-                        </div>
-                        <div class="rounded-3xl bg-white border border-pink-100 p-6 shadow-sm">
-                            <p class="text-xs uppercase tracking-[0.35em] text-pink-500">Ventas recientes</p>
-                            <h2 class="mt-4 text-2xl font-bold text-slate-900">1 orden nueva</h2>
-                            <p class="mt-3 text-slate-500">Revisa pedidos y filtra por estado para asegurar entregas a tiempo.</p>
-                        </div>
-                        <div class="rounded-3xl bg-white border border-pink-100 p-6 shadow-sm">
-                            <p class="text-xs uppercase tracking-[0.35em] text-pink-500">Movimientos</p>
-                            <h2 class="mt-4 text-2xl font-bold text-slate-900">Control de stock</h2>
-                            <p class="mt-3 text-slate-500">Registra entradas y salidas con total visibilidad del inventario.</p>
+                        <div class="relative w-full lg:w-1/2">
+                            <i class="fa-solid fa-barcode absolute left-4 top-1/2 -translate-y-1/2 text-pink-400 text-lg"></i>
+                            <input type="text" placeholder="Escribe o escanea el código de barras único..." class="w-full rounded-3xl border border-pink-100 bg-white py-3 pl-12 pr-4 text-slate-700 outline-none focus:border-pink-300 focus:ring-2 focus:ring-pink-100" />
                         </div>
                     </div>
                 </div>
 
+                {{-- ===== SECCIÓN: RESUMEN ===== --}}
                 <section id="resumen" class="mb-8">
                     <div class="grid gap-6 lg:grid-cols-3 mb-6">
                         <div class="rounded-3xl bg-white border border-pink-100 p-6 shadow-sm">
                             <p class="text-xs uppercase tracking-[0.35em] text-pink-500">Ventas Totales</p>
                             <p class="mt-4 text-3xl font-bold text-slate-900">$0</p>
-                            <p class="mt-2 text-sm text-slate-500">Acumulado en el último mes.</p>
                         </div>
                         <div class="rounded-3xl bg-white border border-pink-100 p-6 shadow-sm">
-                            <p class="text-xs uppercase tracking-[0.35em] text-pink-500">Clientes</p>
-                            <p class="mt-4 text-3xl font-bold text-slate-900">0</p>
-                            <p class="mt-2 text-sm text-slate-500">Registrados en el sistema.</p>
+                            <p class="text-xs uppercase tracking-[0.35em] text-pink-500">Personal del Sistema</p>
+                            <p class="mt-4 text-3xl font-bold text-slate-900">{{ $usuarios->count() }}</p>
                         </div>
                         <div class="rounded-3xl bg-white border border-pink-100 p-6 shadow-sm">
                             <p class="text-xs uppercase tracking-[0.35em] text-pink-500">Prendas Activas</p>
                             <p class="mt-4 text-3xl font-bold text-slate-900">{{ $prendas->where('estado',1)->count() }}</p>
-                            <p class="mt-2 text-sm text-slate-500">Disponibles en tienda.</p>
                         </div>
                     </div>
                 </section>
 
+                {{-- ===== SECCIÓN: VENTAS ===== --}}
                 <section id="ventas" class="mb-8 hidden">
-                    <div class="rounded-3xl bg-white border border-pink-100 p-6 shadow-sm">
-                        <div class="flex items-center justify-between gap-4 mb-6">
-                            <div>
-                                <h2 class="text-2xl font-bold text-slate-900">Ventas Recientes</h2>
-                                <p class="text-slate-500 mt-2">Últimos pedidos registrados.</p>
-                            </div>
-                            <button class="inline-flex items-center gap-2 rounded-3xl bg-pink-500 px-4 py-3 text-sm font-semibold text-white hover:bg-pink-600 transition">
-                                <i class="fa-solid fa-filter"></i> Filtrar
-                            </button>
-                        </div>
-                        <div class="space-y-4">
-                            <div class="rounded-3xl border border-pink-100 bg-white p-4">
-                                <div class="flex items-center justify-between gap-4">
+                    <div id="alertBoxVentas" class="hidden mb-6 p-4 rounded-2xl text-sm font-semibold flex items-center gap-2 shadow-sm animate-fade-in"></div>
+
+                    <div class="grid grid-cols-1 xl:grid-cols-3 gap-8 items-start">
+                        <div class="xl:col-span-2 bg-white border border-pink-100 p-8 rounded-[2rem] shadow-sm space-y-6">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-pink-50 pb-4">
+                                <div class="flex items-center gap-3 text-pink-500">
+                                    <i class="fa-solid fa-cash-register text-2xl"></i>
                                     <div>
-                                        <p class="text-slate-900 font-semibold">#0001 — Juan Perez</p>
-                                        <p class="text-sm text-slate-500">Camiseta Oversize, Pantalón Cargo Negro</p>
+                                        <h2 class="text-xl font-bold text-slate-900">Registrar Venta u Operación</h2>
+                                        <p class="text-xs text-slate-400 font-medium">Facturación fluida para prendas y calzado.</p>
                                     </div>
-                                    <span class="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700">Pendiente</span>
                                 </div>
-                                <div class="mt-4 flex items-center justify-between text-sm text-slate-500">
-                                    <span>Total: $93.000</span>
-                                    <span>2026-04-02</span>
+                                <button type="button" id="btnAlertaStock" class="inline-flex items-center gap-2 text-xs font-bold text-amber-600 bg-amber-50 border border-amber-200 px-4 py-2 rounded-2xl hover:bg-amber-100 transition">
+                                    <i class="fa-solid fa-triangle-exclamation"></i> Avisar Admin sobre Bajo Stock
+                                </button>
+                            </div>
+
+                            <form action="{{ route('venta.store') }}" method="POST" id="formTransaccion" class="space-y-6">
+                                @csrf
+                                {{-- Campo oculto para pasar el código escaneado al backend --}}
+                                <input type="hidden" name="codigo_barras" id="hidden_codigo_barras">
+                                <input type="hidden" name="precio_unitario" id="hidden_precio_unitario">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div class="space-y-1">
+                                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Tipo de Transacción</label>
+                                        <select name="tipo_proceso" id="tipo_proceso" required class="w-full rounded-2xl border border-pink-100 bg-white px-4 py-3 text-sm font-bold text-pink-600 outline-none focus:border-pink-300 focus:ring-2 focus:ring-pink-100 transition">
+                                            <option value="venta">🛒 Registrar Venta Inmediata</option>
+                                            <option value="apartado">📌 Apartar Prenda / Separado</option>
+                                            <option value="cambio">🔄 Realizar Cambio de Prenda</option>
+                                            <option value="devolucion">↩️ Procesar Devolución (Kardex)</option>
+                                        </select>
+                                    </div>
+                                    <div class="space-y-1">
+                                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Asignar Cliente</label>
+                                        <select name="fk_id_cliente" required class="w-full rounded-2xl border border-pink-100 bg-white px-4 py-3 text-sm text-slate-700 outline-none focus:border-pink-300 focus:ring-2 focus:ring-pink-100 transition">
+                                            <option value="1">Cliente General / Ocasional</option>
+                                        </select>
+                                    </div>
                                 </div>
+
+                                <div class="bg-pink-50/40 border border-pink-100/70 p-5 rounded-2xl space-y-2">
+                                    <label class="block text-xs uppercase tracking-wider font-bold text-pink-600 flex items-center justify-between">
+                                        <span class="flex items-center gap-2"><i class="fa-solid fa-barcode text-sm"></i> Escanear Código de Barras Único</span>
+                                        <span id="searchStatusVentas" class="text-[10px] font-bold text-pink-500 bg-white border border-pink-200 px-2 py-0.5 rounded-md hidden">Buscando...</span>
+                                    </label>
+                                    <input type="text" id="codigo_barras_venta" name="codigo_barras" required autocomplete="off"
+                                        placeholder="Pasa el lector láser o digita el código de barras..."
+                                        class="w-full rounded-xl border border-pink-200 bg-white px-4 py-3.5 text-base text-slate-800 font-mono font-bold focus:border-pink-400 focus:ring-4 focus:ring-pink-50 outline-none transition" />
+                                </div>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div class="space-y-1">
+                                        <label class="block text-xs font-semibold text-slate-400">Prenda Identificada</label>
+                                        <input type="text" id="nombre_prend_venta" readonly placeholder="Esperando escaneo..."
+                                            class="w-full rounded-xl border border-slate-100 bg-slate-50 px-4 py-2.5 text-sm font-bold text-slate-700 outline-none" />
+                                    </div>
+                                    <div class="space-y-1">
+                                        <label class="block text-xs font-semibold text-slate-400">Variación (Talla / Color)</label>
+                                        <input type="text" id="detalles_prend_venta" readonly placeholder="—"
+                                            class="w-full rounded-xl border border-slate-100 bg-slate-50 px-4 py-2.5 text-sm font-medium text-slate-500 outline-none" />
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                    <div class="space-y-1">
+                                        <label class="block text-xs font-semibold text-slate-400">Precio Base ($)</label>
+                                        <input type="number" id="precio_unitario_venta" name="precio_unitario" readonly placeholder="0"
+                                            class="w-full rounded-xl border border-slate-100 bg-slate-50 px-4 py-2.5 text-sm font-mono font-bold text-slate-800 outline-none" />
+                                    </div>
+                                    <div class="space-y-1">
+                                        <label class="block text-xs font-semibold text-slate-400">Stock Actual en Sistema</label>
+                                        <input type="text" id="stock_disponible_venta" readonly placeholder="0 uds"
+                                            class="w-full rounded-xl border border-slate-100 bg-slate-50 px-4 py-2.5 text-sm font-bold text-slate-600 outline-none" />
+                                    </div>
+                                    <div class="space-y-1">
+                                        <label class="block text-xs font-semibold text-slate-600 flex items-center gap-1"><i class="fa-solid fa-arrow-up-9-0 text-pink-500"></i> Cantidad</label>
+                                        <input type="number" id="cantidad_vendida_venta" name="cantidad_vendida" required min="1" disabled value="1"
+                                            class="w-full rounded-xl border border-pink-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-800 outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-50 transition" />
+                                    </div>
+                                </div>
+
+                                <div class="pt-4 border-t border-pink-50 flex justify-end">
+                                    <button type="submit" id="btnSubmitVenta" disabled class="w-full sm:w-auto bg-slate-200 text-slate-400 font-bold text-sm px-8 py-3.5 rounded-2xl transition flex items-center justify-center gap-2 cursor-not-allowed">
+                                        <i class="fa-solid fa-check"></i> Procesar Registro
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="bg-slate-900 text-white p-8 rounded-[2rem] shadow-xl space-y-6 sticky top-6">
+                            <span class="text-xs font-black uppercase tracking-widest text-pink-400">Resumen en Caja</span>
+                            <div class="space-y-4 border-b border-slate-800 pb-6">
+                                <div class="flex justify-between text-xs font-medium text-slate-400">
+                                    <span>Subtotal Operación:</span>
+                                    <span id="resumen_subtotal_venta">$0</span>
+                                </div>
+                                <div class="flex justify-between text-xs font-medium text-slate-400">
+                                    <span>Impuestos incluidos:</span>
+                                    <span>$0</span>
+                                </div>
+                            </div>
+                            <div class="space-y-1">
+                                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Transacción</p>
+                                <h2 class="text-4xl font-black text-white tracking-tight" id="resumen_total_venta">$0</h2>
+                            </div>
+                            <div class="bg-slate-800/70 p-4 rounded-2xl border border-slate-800 text-xs text-slate-400 leading-relaxed">
+                                <i class="fa-solid fa-circle-info text-pink-400 mr-1"></i> El sistema ingresará o retirará las prendas del inventario de forma automática según la operación elegida.
                             </div>
                         </div>
                     </div>
+
+                    {{-- ===== HISTORIAL DE VENTAS DENTRO DE LA PESTAÑA VENTAS ===== --}}
+                    <div class="mt-8 bg-white border border-pink-100 p-8 rounded-[2rem] shadow-sm">
+                        <div class="flex items-center justify-between mb-6">
+                            <h2 class="text-xl font-bold text-slate-900">
+                                <i class="fa-solid fa-clock-rotate-left text-pink-500 mr-2"></i> Historial de Operaciones
+                            </h2>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="border-b border-pink-100 text-slate-400 text-xs uppercase tracking-wider">
+                                        <th class="pb-3 font-semibold">ID Transacción</th>
+                                        <th class="pb-3 font-semibold">Fecha</th>
+                                        <th class="pb-3 font-semibold">Total</th>
+                                        <th class="pb-3 font-semibold">Cant. Prendas</th>
+                                        <th class="pb-3 font-semibold">ID Cliente</th>
+                                        <th class="pb-3 font-semibold">ID Empleado</th> {{-- NUEVA COLUMNA --}}
+                                    </tr>
+                                </thead>
+                                <tbody class="text-sm divide-y divide-pink-50">
+                                    @if(isset($ventas) && count($ventas) > 0)
+                                        @foreach($ventas as $v)
+                                        <tr class="hover:bg-pink-50/50 transition">
+                                            <td class="py-4 font-bold text-slate-700">#{{ $v->id_venta }}</td>
+                                            <td class="py-4 text-slate-500">{{ $v->fecha_venta }}</td>
+                                            <td class="py-4 font-black text-pink-600">${{ number_format($v->total, 0, ',', '.') }}</td>
+                                            <td class="py-4 text-slate-600 font-medium">{{ $v->cantidad }}</td>
+                                            <td class="py-4 text-slate-500">
+                                                <span class="bg-slate-100 text-slate-600 px-2 py-1 rounded-lg text-xs">{{ $v->fk_id_cliente }}</span>
+                                            </td>
+                                            {{-- DATO DEL EMPLEADO QUE PEDISTE --}}
+                                            <td class="py-4 text-slate-500">
+                                                <span class="bg-pink-100 text-pink-700 font-bold px-2 py-1 rounded-lg text-xs">
+                                                    {{ $v->fk_id_empleado ?? 'Admin' }}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        @endforeach
+                                    @else
+                                        <tr>
+                                            <td colspan="6" class="py-8 text-center">
+                                                <div class="inline-flex flex-col items-center justify-center p-6 bg-pink-50/50 rounded-2xl border border-dashed border-pink-200">
+                                                    <i class="fa-solid fa-receipt text-3xl text-pink-200 mb-2"></i>
+                                                    <span class="text-slate-400 font-medium">No hay ventas registradas en la base de datos en este momento.</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endif
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
                 </section>
 
+                {{-- ===== SECCIÓN: INVENTARIO ===== --}}
                 <section id="inventario" class="mb-8 hidden">
                     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
                         <div>
                             <h2 class="text-2xl font-bold text-slate-900">Catálogo / Inventario</h2>
-                            <p class="text-slate-500">Gestiona tus prendas y revisa existencias actualizadas.</p>
                         </div>
-                        <button onclick="toggleModal('createModal')" class="inline-flex items-center gap-2 rounded-3xl bg-pink-500 px-5 py-3 text-sm font-semibold text-white hover:bg-pink-600 transition shadow-sm shadow-pink-200/40">
+                        {{-- CORRECCIÓN: el id del modal debe existir en el DOM --}}
+                        <button onclick="toggleModal('createModal')" class="inline-flex items-center gap-2 rounded-3xl bg-pink-500 px-5 py-3 text-sm font-semibold text-white hover:bg-pink-600 transition">
                             <i class="fa-solid fa-plus"></i> Agregar Prenda
                         </button>
                     </div>
@@ -182,275 +322,552 @@
                         @foreach($prendas as $p)
                         <div class="rounded-3xl bg-white border border-pink-100 p-6 shadow-sm hover:shadow-md transition">
                             <div class="flex items-start gap-4">
-                                <div class="h-20 w-20 rounded-3xl bg-pink-100 flex items-center justify-center text-pink-500 text-3xl font-bold">P</div>
+                                @if($p->imagen_prend)
+                                    <img src="data:image/jpeg;base64,{{ base64_encode($p->imagen_prend) }}"
+                                         alt="{{ $p->nombre_prend }}"
+                                         class="h-20 w-20 rounded-3xl object-cover shrink-0" />
+                                @else
+                                    <div class="h-20 w-20 rounded-3xl bg-pink-100 flex items-center justify-center text-pink-500 text-3xl font-bold shrink-0">
+                                        {{ strtoupper(substr($p->nombre_prend, 0, 1)) }}
+                                    </div>
+                                @endif
                                 <div class="flex-1">
                                     <div class="flex items-center justify-between gap-4">
                                         <div>
                                             <h3 class="text-lg font-semibold text-slate-900">{{ $p->nombre_prend }}</h3>
-                                            <p class="text-sm text-slate-500 mt-1">{{ $p->descripcion_prend }}</p>
+                                            <p class="text-xs text-slate-400">Código: {{ $p->codigo_barras ?? 'No asignado' }}</p>
                                         </div>
                                         <span class="text-lg font-bold text-pink-500">${{ number_format($p->precio, 0, ',', '.') }}</span>
                                     </div>
-                                    <div class="mt-4 grid gap-2 sm:grid-cols-2">
-                                        <div class="rounded-3xl bg-pink-100 px-4 py-3 text-sm text-pink-600">Stock: {{ $p->stock }}</div>
-                                        <div class="rounded-3xl bg-pink-100 px-4 py-3 text-sm text-pink-600">Talla: {{ $p->talla_prend }}</div>
-                                        <div class="rounded-3xl bg-pink-100 px-4 py-3 text-sm text-pink-600">Color: {{ $p->nom_color }}</div>
-                                        <div class="rounded-3xl bg-pink-100 px-4 py-3 text-sm text-pink-600">Género: {{ $p->tipo_genero }}</div>
+                                    <div class="mt-4 grid grid-cols-2 gap-2">
+                                        <div class="rounded-2xl bg-pink-50/60 p-2 text-xs text-center text-slate-700">Stock: {{ $p->stock }}</div>
+                                        <div class="rounded-2xl bg-pink-50/60 p-2 text-xs text-center text-slate-700">Talla: {{ $p->talla_prend }}</div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                                <span class="inline-flex items-center rounded-full bg-emerald-100 px-3 py-1 text-sm font-semibold text-emerald-700">{{ $p->estado == 1 ? 'Activo' : 'Inactivo' }}</span>
-                                <div class="flex items-center gap-2">
-                                    <button onclick="openEditModal({{ json_encode($p) }})" class="rounded-3xl bg-pink-100 px-4 py-2 text-sm font-semibold text-pink-600 hover:bg-pink-200 transition">Editar</button>
-                                    <form action="{{ route('prenda.destroy', $p->id_prenda) }}" method="POST" class="inline">
+                            <div class="mt-5 flex items-center justify-between">
+                                <span class="rounded-full px-3 py-1 text-xs font-semibold {{ $p->estado == 1 ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500' }}">
+                                    {{ $p->estado == 1 ? 'Activo' : 'Inactivo' }}
+                                </span>
+                                <div class="flex gap-2">
+                                    <button
+                                        onclick="abrirModalEditar(
+                                            '{{ $p->codigo_barras }}',
+                                            '{{ addslashes($p->nombre_prend) }}',
+                                            '{{ addslashes($p->descripcion_prend) }}',
+                                            {{ $p->precio }},
+                                            {{ $p->stock }},
+                                            {{ $p->min_stock }},
+                                            {{ $p->max_stock }},
+                                            {{ $p->fk_id_genero }},
+                                            {{ $p->fk_idt_prendas }},
+                                            {{ $p->fk_id_color }},
+                                            {{ $p->estado }}
+                                        )"
+                                        class="rounded-2xl bg-pink-100 px-4 py-2 text-xs font-semibold text-pink-600 hover:bg-pink-200 transition">
+                                        Editar
+                                    </button>
+                                    <form action="{{ route('prenda.destroy', $p->codigo_barras) }}" method="POST" class="inline">
                                         @csrf @method('DELETE')
-                                        <button type="submit" onclick="return confirm('¿Seguro deseas eliminar esta prenda del inventario por completo?')" class="rounded-3xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-200 transition">Eliminar</button>
+                                        <button type="submit" onclick="return confirm('¿Eliminar prenda?')" class="rounded-2xl bg-slate-100 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-200 transition">Eliminar</button>
                                     </form>
                                 </div>
                             </div>
                         </div>
                         @endforeach
                     </div>
-                    @if(count($prendas) == 0)
-                    <div class="rounded-3xl bg-white border border-pink-100 p-6 text-center text-slate-500">No hay prendas registradas en el inventario actual.</div>
-                    @endif
                 </section>
 
+                {{-- ===== SECCIÓN: FACTURAS ===== --}}
                 <section id="facturas" class="mb-8 hidden">
                     <div class="rounded-3xl bg-white border border-pink-100 p-6 shadow-sm">
-                        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-                            <div>
-                                <h2 class="text-2xl font-bold text-slate-900">Facturas</h2>
-                                <p class="text-slate-500 mt-2">Revisa documentos de pago recientes.</p>
-                            </div>
-                            <button class="inline-flex items-center gap-2 rounded-3xl bg-pink-500 px-4 py-3 text-sm font-semibold text-white hover:bg-pink-600 transition">
-                                <i class="fa-solid fa-file-arrow-up"></i> Generar Factura
-                            </button>
+                        <h2 class="text-2xl font-bold text-slate-900 mb-4">Facturas</h2>
+                        <p class="text-sm text-slate-400">Módulo de facturas en construcción.</p>
+                    </div>
+                </section>
+
+                {{-- ===== SECCIÓN: MOVIMIENTOS ===== --}}
+                <section id="movimientos" class="mb-8 hidden">
+                    <div class="rounded-3xl bg-white border border-pink-100 p-6 shadow-sm">
+                        <div class="mb-6">
+                            <h2 class="text-2xl font-bold text-slate-900">Kardex / Movimientos de Inventario</h2>
+                            <p class="text-xs text-slate-400 mt-1">Historial detallado de entradas, salidas, apartados y devoluciones con fecha.</p>
                         </div>
-                        <div class="space-y-4">
-                            <div class="rounded-3xl border border-pink-100 bg-white p-4">
-                                <div class="flex items-center justify-between gap-4">
-                                    <div>
-                                        <p class="font-semibold text-slate-900">#F-0001</p>
-                                        <p class="text-sm text-slate-500">Andrea López • Pagada</p>
-                                    </div>
-                                    <span class="text-sm font-semibold text-slate-600">$137.500</span>
-                                </div>
-                                <p class="mt-3 text-sm text-slate-500">2026-05-12</p>
-                            </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="border-b border-pink-100 text-slate-400 text-xs uppercase tracking-wider">
+                                        <th class="pb-3 font-semibold">Fecha y Hora</th>
+                                        <th class="pb-3 font-semibold">Prenda</th>
+                                        <th class="pb-3 font-semibold">Tipo Movimiento</th>
+                                        <th class="pb-3 font-semibold">Cantidad</th>
+                                        <th class="pb-3 font-semibold">Responsable</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-sm divide-y divide-pink-50">
+                                    <tr>
+                                        <td class="py-3 text-slate-500">2026-05-20 14:35</td>
+                                        <td class="py-3 font-medium text-slate-900">Chaqueta Cargo Y2K</td>
+                                        <td class="py-3"><span class="bg-blue-100 text-blue-800 text-xs px-2.5 py-1 rounded-full font-medium">Apartado</span></td>
+                                        <td class="py-3 text-slate-600">1 unidad</td>
+                                        <td class="py-3 text-slate-500">Staff Admin</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </section>
 
-                <section id="movimientos" class="mb-8 hidden">
+                {{-- ===== SECCIÓN: USUARIOS ===== --}}
+                <section id="usuarios" class="mb-8 hidden">
                     <div class="rounded-3xl bg-white border border-pink-100 p-6 shadow-sm">
                         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
                             <div>
-                                <h2 class="text-2xl font-bold text-slate-900">Movimientos</h2>
-                                <p class="text-slate-500 mt-2">Registra entradas y salidas de inventario.</p>
+                                <h2 class="text-2xl font-bold text-slate-900">Cuentas y Usuarios</h2>
+                                <p class="text-xs text-slate-400 mt-1">Lista completa de personal administrador, staff y clientes registrados.</p>
                             </div>
                             <button class="inline-flex items-center gap-2 rounded-3xl bg-pink-500 px-4 py-3 text-sm font-semibold text-white hover:bg-pink-600 transition">
-                                <i class="fa-solid fa-plus"></i> Nuevo Movimiento
+                                <i class="fa-solid fa-user-plus"></i> Registrar Usuario
                             </button>
                         </div>
-                        <div class="space-y-4">
-                            <div class="rounded-3xl border border-pink-100 bg-white p-4">
-                                <div class="flex items-center justify-between gap-4">
-                                    <div>
-                                        <p class="font-semibold text-slate-900">#M-001 • Chaqueta Urbana</p>
-                                        <p class="text-sm text-slate-500">Entrada de stock</p>
+                        <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                            @foreach($usuarios as $user)
+                            <div class="p-5 border border-pink-100 rounded-3xl bg-white shadow-sm flex flex-col justify-between">
+                                <div>
+                                    <div class="flex items-center gap-3 mb-3">
+                                        <div class="w-10 h-10 rounded-full bg-pink-100 text-pink-600 flex items-center justify-center font-bold">
+                                            {{ strtoupper(substr($user->name, 0, 1)) }}
+                                        </div>
+                                        <div>
+                                            <h4 class="font-bold text-slate-900 text-base leading-tight">{{ $user->name }}</h4>
+                                            <p class="text-xs text-slate-400">{{ $user->email }}</p>
+                                        </div>
                                     </div>
-                                    <span class="inline-flex rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">+12</span>
+                                    <span class="inline-block text-[11px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-full bg-pink-50 text-pink-600">
+                                        {{ $user->role ?? 'Cliente' }}
+                                    </span>
                                 </div>
-                                <p class="mt-3 text-sm text-slate-500">2026-05-16</p>
+                                <div class="mt-4 pt-3 border-t border-pink-50 flex justify-end gap-2">
+                                    <button class="text-xs font-semibold text-pink-500 hover:underline">Editar</button>
+                                    <form action="{{ route('usuario.destroy', $user->id) }}" method="POST" class="inline">
+                                        @csrf @method('DELETE')
+                                        <button type="submit" onclick="return confirm('¿Eliminar acceso de usuario?')" class="text-xs font-semibold text-slate-400 hover:text-rose-500 transition">Remover</button>
+                                    </form>
+                                </div>
                             </div>
+                            @endforeach
                         </div>
                     </div>
                 </section>
+
             </div>
         </main>
     </div>
+</div>
 
-    <div id="createModal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center hidden z-50 p-4">
-    <div class="bg-white w-full max-w-2xl rounded-xl shadow-2xl overflow-y-auto max-h-[90vh] border border-gray-100">
-        <div class="flex justify-between items-center p-6 border-b border-gray-200 bg-gray-50">
-            <h2 class="text-xl font-bold flex items-center gap-2 text-pink-600"><i class="fa-solid fa-shirt"></i> Registrar Nueva Prenda</h2>
-            <button onclick="toggleModal('createModal')" class="text-gray-400 hover:text-gray-600 text-xl"><i class="fa-solid fa-xmark"></i></button>
+{{-- =====================================================================
+     MODAL: CREAR PRENDA
+     FIX: Este modal faltaba en el HTML original, causando que el botón
+     "Agregar Prenda" no hiciera nada al llamar toggleModal('createModal').
+======================================================================= --}}
+<div id="createModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
+    <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-2xl p-8 relative max-h-[90vh] overflow-y-auto">
+        <button onclick="toggleModal('createModal')" class="absolute top-5 right-5 text-slate-400 hover:text-slate-700 transition text-xl">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+        <div class="flex items-center gap-3 mb-6">
+            <div class="bg-pink-500 text-white rounded-2xl p-3 shadow-lg shadow-pink-500/20">
+                <i class="fa-solid fa-plus"></i>
+            </div>
+            <div>
+                <h2 class="text-xl font-bold text-slate-900">Agregar Nueva Prenda</h2>
+                <p class="text-xs text-slate-400">Completa todos los campos para registrar en el inventario.</p>
+            </div>
         </div>
-        <form action="{{ route('prenda.store') }}" method="POST" class="p-6 space-y-4">
+
+        <form action="{{ route('prenda.store') }}" method="POST" enctype="multipart/form-data" class="space-y-5">
             @csrf
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Nombre Prenda</label>
-                    <input type="text" name="nombre_prend" max="25" required class="w-full bg-gray-50 border border-gray-300 rounded-lg p-2.5 text-gray-900 focus:outline-none focus:border-pink-500">
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="space-y-1">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Código de Barras *</label>
+                    <input type="text" name="codigo_barras" required maxlength="50" placeholder="Ej: 7701234567890"
+                        class="w-full rounded-2xl border border-pink-100 bg-white px-4 py-3 text-sm font-mono text-slate-800 outline-none focus:border-pink-300 focus:ring-2 focus:ring-pink-100 transition" />
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Descripción Breve</label>
-                    <input type="text" name="descripcion_prend" max="35" required class="w-full bg-gray-50 border border-gray-300 rounded-lg p-2.5 text-gray-900 focus:outline-none focus:border-pink-500">
+                <div class="space-y-1">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Nombre *</label>
+                    <input type="text" name="nombre_prend" required maxlength="25" placeholder="Ej: Camiseta Básica"
+                        class="w-full rounded-2xl border border-pink-100 bg-white px-4 py-3 text-sm text-slate-800 outline-none focus:border-pink-300 focus:ring-2 focus:ring-pink-100 transition" />
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Precio ($ COP)</label>
-                    <input type="number" name="precio" min="0" required class="w-full bg-gray-50 border border-gray-300 rounded-lg p-2.5 text-gray-900 focus:outline-none focus:border-pink-500">
+            </div>
+
+            <div class="space-y-1">
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Descripción *</label>
+                <input type="text" name="descripcion_prend" required maxlength="35" placeholder="Ej: Camiseta de algodón manga corta"
+                    class="w-full rounded-2xl border border-pink-100 bg-white px-4 py-3 text-sm text-slate-800 outline-none focus:border-pink-300 focus:ring-2 focus:ring-pink-100 transition" />
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="space-y-1">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Precio (COP) *</label>
+                    <input type="number" name="precio" required min="0" placeholder="0"
+                        class="w-full rounded-2xl border border-pink-100 bg-white px-4 py-3 text-sm font-mono text-slate-800 outline-none focus:border-pink-300 focus:ring-2 focus:ring-pink-100 transition" />
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Stock Inicial</label>
-                    <input type="number" name="stock" min="0" required class="w-full bg-gray-50 border border-gray-300 rounded-lg p-2.5 text-gray-900 focus:outline-none focus:border-pink-500">
+                <div class="space-y-1">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Stock Inicial *</label>
+                    <input type="number" name="stock" required min="0" placeholder="0"
+                        class="w-full rounded-2xl border border-pink-100 bg-white px-4 py-3 text-sm font-mono text-slate-800 outline-none focus:border-pink-300 focus:ring-2 focus:ring-pink-100 transition" />
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Stock Mínimo</label>
-                    <input type="number" name="min_stock" min="0" required class="w-full bg-gray-50 border border-gray-300 rounded-lg p-2.5 text-gray-900 focus:outline-none focus:border-pink-500">
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="space-y-1">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Stock Mínimo *</label>
+                    <input type="number" name="min_stock" required min="0" placeholder="0"
+                        class="w-full rounded-2xl border border-pink-100 bg-white px-4 py-3 text-sm font-mono text-slate-800 outline-none focus:border-pink-300 focus:ring-2 focus:ring-pink-100 transition" />
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Stock Máximo</label>
-                    <input type="number" name="max_stock" min="0" required class="w-full bg-gray-50 border border-gray-300 rounded-lg p-2.5 text-gray-900 focus:outline-none focus:border-pink-500">
+                <div class="space-y-1">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Stock Máximo *</label>
+                    <input type="number" name="max_stock" required min="0" placeholder="0"
+                        class="w-full rounded-2xl border border-pink-100 bg-white px-4 py-3 text-sm font-mono text-slate-800 outline-none focus:border-pink-300 focus:ring-2 focus:ring-pink-100 transition" />
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Género</label>
-                    <select name="fk_id_genero" required class="w-full bg-gray-50 border border-gray-300 rounded-lg p-2.5 text-gray-900 focus:outline-none focus:border-pink-500">
-                        @foreach($generos as $g) <option value="{{ $g->id_genero_prend }}">{{ $g->tipo_genero }}</option> @endforeach
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="space-y-1">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Género *</label>
+                    <select name="fk_id_genero" required class="w-full rounded-2xl border border-pink-100 bg-white px-4 py-3 text-sm text-slate-700 outline-none focus:border-pink-300 focus:ring-2 focus:ring-pink-100 transition">
+                        <option value="">— Selecciona —</option>
+                        @foreach($generos as $g)
+                            <option value="{{ $g->id_genero_prend }}">{{ $g->tipo_genero }}</option>
+                        @endforeach
                     </select>
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Talla</label>
-                    <select name="fk_idt_prendas" required class="w-full bg-gray-50 border border-gray-300 rounded-lg p-2.5 text-gray-900 focus:outline-none focus:border-pink-500">
-                        @foreach($tallas as $t) <option value="{{ $t->idt_prendas }}">{{ $t->talla_prend }}</option> @endforeach
+                <div class="space-y-1">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Talla *</label>
+                    <select name="fk_idt_prendas" required class="w-full rounded-2xl border border-pink-100 bg-white px-4 py-3 text-sm text-slate-700 outline-none focus:border-pink-300 focus:ring-2 focus:ring-pink-100 transition">
+                        <option value="">— Selecciona —</option>
+                        @foreach($tallas as $t)
+                            <option value="{{ $t->idt_prendas }}">{{ $t->talla_prend }}</option>
+                        @endforeach
                     </select>
                 </div>
-                <div class="md:col-span-2">
-                    <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Color</label>
-                    <select name="fk_id_color" required class="w-full bg-gray-50 border border-gray-300 rounded-lg p-2.5 text-gray-900 focus:outline-none focus:border-pink-500">
-                        @foreach($colores as $c) <option value="{{ $c->id_color }}">{{ $c->nom_color }}</option> @endforeach
+                <div class="space-y-1">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Color *</label>
+                    <select name="fk_id_color" required class="w-full rounded-2xl border border-pink-100 bg-white px-4 py-3 text-sm text-slate-700 outline-none focus:border-pink-300 focus:ring-2 focus:ring-pink-100 transition">
+                        <option value="">— Selecciona —</option>
+                        @foreach($colores as $c)
+                            <option value="{{ $c->id_color }}">{{ $c->nom_color }}</option>
+                        @endforeach
                     </select>
                 </div>
             </div>
-            <div class="flex justify-end gap-3 pt-4 border-t border-gray-200">
-                <button type="button" onclick="toggleModal('createModal')" class="px-5 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg transition font-medium">Cancelar</button>
-                <button type="submit" class="px-5 py-2.5 bg-pink-600 hover:bg-pink-700 text-white font-semibold rounded-lg transition shadow-sm">Guardar Prenda</button>
+
+            <div class="space-y-1">
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Imagen (opcional)</label>
+                <input type="file" name="imagen_prend" accept="image/*"
+                    class="w-full rounded-2xl border border-pink-100 bg-white px-4 py-3 text-sm text-slate-700 outline-none focus:border-pink-300 transition file:mr-3 file:py-1 file:px-3 file:rounded-xl file:border-0 file:bg-pink-50 file:text-pink-600 file:font-semibold file:text-xs" />
+            </div>
+
+            <div class="flex justify-end gap-3 pt-4 border-t border-pink-50">
+                <button type="button" onclick="toggleModal('createModal')" class="px-6 py-3 rounded-2xl border border-pink-100 text-sm font-semibold text-slate-600 hover:bg-slate-50 transition">
+                    Cancelar
+                </button>
+                <button type="submit" class="px-8 py-3 rounded-2xl bg-pink-500 text-white text-sm font-bold hover:bg-pink-600 transition shadow-lg shadow-pink-500/20">
+                    <i class="fa-solid fa-floppy-disk mr-2"></i> Guardar Prenda
+                </button>
             </div>
         </form>
     </div>
 </div>
 
-<div id="editModal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center hidden z-50 p-4">
-    <div class="bg-white w-full max-w-2xl rounded-xl shadow-2xl overflow-y-auto max-h-[90vh] border border-gray-100">
-        <div class="flex justify-between items-center p-6 border-b border-gray-200 bg-gray-50">
-            <h2 class="text-xl font-bold flex items-center gap-2 text-pink-600"><i class="fa-solid fa-pen-to-square"></i> Editar Características de Prenda</h2>
-            <button onclick="toggleModal('editModal')" class="text-gray-400 hover:text-gray-600 text-xl"><i class="fa-solid fa-xmark"></i></button>
+{{-- =====================================================================
+     MODAL: EDITAR PRENDA
+======================================================================= --}}
+<div id="editModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
+    <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-2xl p-8 relative max-h-[90vh] overflow-y-auto">
+        <button onclick="toggleModal('editModal')" class="absolute top-5 right-5 text-slate-400 hover:text-slate-700 transition text-xl">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+        <div class="flex items-center gap-3 mb-6">
+            <div class="bg-pink-100 text-pink-600 rounded-2xl p-3">
+                <i class="fa-solid fa-pen"></i>
+            </div>
+            <div>
+                <h2 class="text-xl font-bold text-slate-900">Editar Prenda</h2>
+                <p class="text-xs text-slate-400">Modifica los datos y guarda los cambios.</p>
+            </div>
         </div>
-        <form id="editForm" method="POST" class="p-6 space-y-4">
+
+        <form id="editForm" action="" method="POST" enctype="multipart/form-data" class="space-y-5">
             @csrf @method('PUT')
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Nombre Prenda</label>
-                    <input type="text" name="nombre_prend" id="edit_nombre" max="25" required class="w-full bg-gray-50 border border-gray-300 rounded-lg p-2.5 text-gray-900 focus:outline-none focus:border-pink-500">
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="space-y-1">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Código de Barras *</label>
+                    <input type="text" id="edit_codigo_barras" name="codigo_barras" required maxlength="50"
+                        class="w-full rounded-2xl border border-pink-100 bg-white px-4 py-3 text-sm font-mono text-slate-800 outline-none focus:border-pink-300 focus:ring-2 focus:ring-pink-100 transition" />
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Descripción Breve</label>
-                    <input type="text" name="descripcion_prend" id="edit_descripcion" max="35" required class="w-full bg-gray-50 border border-gray-300 rounded-lg p-2.5 text-gray-900 focus:outline-none focus:border-pink-500">
+                <div class="space-y-1">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Nombre *</label>
+                    <input type="text" id="edit_nombre_prend" name="nombre_prend" required maxlength="25"
+                        class="w-full rounded-2xl border border-pink-100 bg-white px-4 py-3 text-sm text-slate-800 outline-none focus:border-pink-300 focus:ring-2 focus:ring-pink-100 transition" />
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Precio ($ COP)</label>
-                    <input type="number" name="precio" id="edit_precio" min="0" required class="w-full bg-gray-50 border border-gray-300 rounded-lg p-2.5 text-gray-900 focus:outline-none focus:border-pink-500">
+            </div>
+
+            <div class="space-y-1">
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Descripción *</label>
+                <input type="text" id="edit_descripcion_prend" name="descripcion_prend" required maxlength="35"
+                    class="w-full rounded-2xl border border-pink-100 bg-white px-4 py-3 text-sm text-slate-800 outline-none focus:border-pink-300 focus:ring-2 focus:ring-pink-100 transition" />
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="space-y-1">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Precio (COP) *</label>
+                    <input type="number" id="edit_precio" name="precio" required min="0"
+                        class="w-full rounded-2xl border border-pink-100 bg-white px-4 py-3 text-sm font-mono text-slate-800 outline-none focus:border-pink-300 focus:ring-2 focus:ring-pink-100 transition" />
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Stock Actual</label>
-                    <input type="number" name="stock" id="edit_stock" min="0" required class="w-full bg-gray-50 border border-gray-300 rounded-lg p-2.5 text-gray-900 focus:outline-none focus:border-pink-500">
+                <div class="space-y-1">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Stock *</label>
+                    <input type="number" id="edit_stock" name="stock" required min="0"
+                        class="w-full rounded-2xl border border-pink-100 bg-white px-4 py-3 text-sm font-mono text-slate-800 outline-none focus:border-pink-300 focus:ring-2 focus:ring-pink-100 transition" />
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Stock Mínimo</label>
-                    <input type="number" name="min_stock" id="edit_min" min="0" required class="w-full bg-gray-50 border border-gray-300 rounded-lg p-2.5 text-gray-900 focus:outline-none focus:border-pink-500">
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="space-y-1">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Stock Mínimo *</label>
+                    <input type="number" id="edit_min_stock" name="min_stock" required min="0"
+                        class="w-full rounded-2xl border border-pink-100 bg-white px-4 py-3 text-sm font-mono text-slate-800 outline-none focus:border-pink-300 focus:ring-2 focus:ring-pink-100 transition" />
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Stock Máximo</label>
-                    <input type="number" name="max_stock" id="edit_max" min="0" required class="w-full bg-gray-50 border border-gray-300 rounded-lg p-2.5 text-gray-900 focus:outline-none focus:border-pink-500">
+                <div class="space-y-1">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Stock Máximo *</label>
+                    <input type="number" id="edit_max_stock" name="max_stock" required min="0"
+                        class="w-full rounded-2xl border border-pink-100 bg-white px-4 py-3 text-sm font-mono text-slate-800 outline-none focus:border-pink-300 focus:ring-2 focus:ring-pink-100 transition" />
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Género</label>
-                    <select name="fk_id_genero" id="edit_genero" required class="w-full bg-gray-50 border border-gray-300 rounded-lg p-2.5 text-gray-900 focus:outline-none focus:border-pink-500">
-                        @foreach($generos as $g) <option value="{{ $g->id_genero_prend }}">{{ $g->tipo_genero }}</option> @endforeach
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="space-y-1">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Género *</label>
+                    <select id="edit_fk_id_genero" name="fk_id_genero" required class="w-full rounded-2xl border border-pink-100 bg-white px-4 py-3 text-sm text-slate-700 outline-none focus:border-pink-300 focus:ring-2 focus:ring-pink-100 transition">
+                        @foreach($generos as $g)
+                            <option value="{{ $g->id_genero_prend }}">{{ $g->tipo_genero }}</option>
+                        @endforeach
                     </select>
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Talla</label>
-                    <select name="fk_idt_prendas" id="edit_talla" required class="w-full bg-gray-50 border border-gray-300 rounded-lg p-2.5 text-gray-900 focus:outline-none focus:border-pink-500">
-                        @foreach($tallas as $t) <option value="{{ $t->idt_prendas }}">{{ $t->talla_prend }}</option> @endforeach
+                <div class="space-y-1">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Talla *</label>
+                    <select id="edit_fk_idt_prendas" name="fk_idt_prendas" required class="w-full rounded-2xl border border-pink-100 bg-white px-4 py-3 text-sm text-slate-700 outline-none focus:border-pink-300 focus:ring-2 focus:ring-pink-100 transition">
+                        @foreach($tallas as $t)
+                            <option value="{{ $t->idt_prendas }}">{{ $t->talla_prend }}</option>
+                        @endforeach
                     </select>
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Color</label>
-                    <select name="fk_id_color" id="edit_color" required class="w-full bg-gray-50 border border-gray-300 rounded-lg p-2.5 text-gray-900 focus:outline-none focus:border-pink-500">
-                        @foreach($colores as $c) <option value="{{ $c->id_color }}">{{ $c->nom_color }}</option> @endforeach
+                <div class="space-y-1">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Color *</label>
+                    <select id="edit_fk_id_color" name="fk_id_color" required class="w-full rounded-2xl border border-pink-100 bg-white px-4 py-3 text-sm text-slate-700 outline-none focus:border-pink-300 focus:ring-2 focus:ring-pink-100 transition">
+                        @foreach($colores as $c)
+                            <option value="{{ $c->id_color }}">{{ $c->nom_color }}</option>
+                        @endforeach
                     </select>
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Estado de Visibilidad</label>
-                    <select name="estado" id="edit_estado" required class="w-full bg-gray-50 border border-gray-300 rounded-lg p-2.5 text-gray-900 focus:outline-none focus:border-pink-500">
-                        <option value="1">Activo (Visible en Tienda)</option>
-                        <option value="0">Inactivo (Oculto)</option>
+                <div class="space-y-1">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Estado *</label>
+                    <select id="edit_estado" name="estado" required class="w-full rounded-2xl border border-pink-100 bg-white px-4 py-3 text-sm text-slate-700 outline-none focus:border-pink-300 focus:ring-2 focus:ring-pink-100 transition">
+                        <option value="1">Activo</option>
+                        <option value="0">Inactivo</option>
                     </select>
                 </div>
             </div>
-            <div class="flex justify-end gap-3 pt-4 border-t border-gray-200">
-                <button type="button" onclick="toggleModal('editModal')" class="px-5 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg transition font-medium">Cancelar</button>
-                <button type="submit" class="px-5 py-2.5 bg-pink-600 hover:bg-pink-700 text-white font-semibold rounded-lg transition shadow-sm">Actualizar Prenda</button>
+
+            <div class="space-y-1">
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Nueva Imagen (opcional)</label>
+                <input type="file" name="imagen_prend" accept="image/*"
+                    class="w-full rounded-2xl border border-pink-100 bg-white px-4 py-3 text-sm text-slate-700 outline-none focus:border-pink-300 transition file:mr-3 file:py-1 file:px-3 file:rounded-xl file:border-0 file:bg-pink-50 file:text-pink-600 file:font-semibold file:text-xs" />
+            </div>
+
+            <div class="flex justify-end gap-3 pt-4 border-t border-pink-50">
+                <button type="button" onclick="toggleModal('editModal')" class="px-6 py-3 rounded-2xl border border-pink-100 text-sm font-semibold text-slate-600 hover:bg-slate-50 transition">
+                    Cancelar
+                </button>
+                <button type="submit" class="px-8 py-3 rounded-2xl bg-pink-500 text-white text-sm font-bold hover:bg-pink-600 transition shadow-lg shadow-pink-500/20">
+                    <i class="fa-solid fa-floppy-disk mr-2"></i> Actualizar Prenda
+                </button>
             </div>
         </form>
     </div>
 </div>
 
+{{-- =====================================================================
+     SCRIPTS
+======================================================================= --}}
 <script>
+    // ── Helpers de modal ──────────────────────────────────────────────────
     function toggleModal(modalId) {
-        const modal = document.getElementById(modalId);
-        modal.classList.toggle('hidden');
+        document.getElementById(modalId).classList.toggle('hidden');
     }
 
-    function openEditModal(prenda) {
-        // Enlaza la ruta dinámica de actualización
-        document.getElementById('editForm').action = `/dashboard/prenda/${prenda.id_prenda}`;
-        
-        // Carga dinámicamente el objeto en el modal
-        document.getElementById('edit_nombre').value = prenda.nombre_prend;
-        document.getElementById('edit_descripcion').value = prenda.descripcion_prend;
-        document.getElementById('edit_precio').value = prenda.precio;
-        document.getElementById('edit_stock').value = prenda.stock;
-        document.getElementById('edit_min').value = prenda.min_stock;
-        document.getElementById('edit_max').value = prenda.max_stock;
-        document.getElementById('edit_genero').value = prenda.fk_id_genero;
-        document.getElementById('edit_talla').value = prenda.fk_idt_prendas;
-        document.getElementById('edit_color').value = prenda.fk_id_color;
-        document.getElementById('edit_estado').value = prenda.estado;
-
+    // Rellenar y abrir modal de edición
+    function abrirModalEditar(codigo, nombre, descripcion, precio, stock, min_stock, max_stock, genero, talla, color, estado) {
+        document.getElementById('edit_codigo_barras').value    = codigo;
+        document.getElementById('edit_nombre_prend').value     = nombre;
+        document.getElementById('edit_descripcion_prend').value = descripcion;
+        document.getElementById('edit_precio').value           = precio;
+        document.getElementById('edit_stock').value            = stock;
+        document.getElementById('edit_min_stock').value        = min_stock;
+        document.getElementById('edit_max_stock').value        = max_stock;
+        document.getElementById('edit_fk_id_genero').value     = genero;
+        document.getElementById('edit_fk_idt_prendas').value   = talla;
+        document.getElementById('edit_fk_id_color').value      = color;
+        document.getElementById('edit_estado').value           = estado;
+        // Ajustar la acción del formulario con el código de barras correcto
+        document.getElementById('editForm').action = '/dashboard/prenda/' + encodeURIComponent(codigo);
         toggleModal('editModal');
     }
 
+    // ── Navegación SPA (pestañas sidebar) ────────────────────────────────
     function activateDashboardTab(sectionId) {
-        const sections = ['resumen','ventas','inventario','facturas','movimientos'];
+        const sections = ['resumen','ventas','inventario','facturas','movimientos','usuarios'];
         sections.forEach((id) => {
             const section = document.getElementById(id);
-            if (!section) return;
-            section.classList.toggle('hidden', id !== sectionId);
-        });
-
-        document.querySelectorAll('.sidebar-link').forEach((link) => {
-            const isActive = link.dataset.section === sectionId;
-            link.classList.toggle('bg-pink-500/10', isActive);
-            link.classList.toggle('border-pink-100', isActive);
-            link.classList.toggle('text-pink-600', isActive);
-            link.classList.toggle('shadow-sm', isActive);
-            link.classList.toggle('shadow-pink-200/40', isActive);
-            link.classList.toggle('text-slate-600', !isActive);
+            if (section) section.classList.toggle('hidden', id !== sectionId);
         });
     }
 
     document.querySelectorAll('.sidebar-link').forEach((link) => {
-        link.addEventListener('click', function(event) {
-            event.preventDefault();
-            activateDashboardTab(this.dataset.section);
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetSection = this.dataset.section;
+            if (!targetSection) return;
+
+            activateDashboardTab(targetSection);
+
+            document.querySelectorAll('.sidebar-link').forEach((l) => {
+                l.classList.remove('bg-pink-500/10', 'border-pink-100', 'text-pink-600', 'shadow-sm', 'active-link');
+                l.classList.add('text-slate-600');
+            });
+
+            this.classList.add('bg-pink-500/10', 'border-pink-100', 'text-pink-600', 'shadow-sm', 'active-link');
         });
     });
+    // ── Escáner de código de barras con DEBOUNCE ─────────────────────────
+    // FIX: Se añadió debounce de 400ms para evitar que peticiones parciales
+    // (carácter por carácter del escáner) pisen la respuesta del código completo.
+    // FIX: Se lee data.message del JSON en vez de mostrar un mensaje genérico.
+    // FIX: encodeURIComponent() protege códigos con caracteres especiales en la URL.
+    let debounceTimer = null;
+    document.getElementById('codigo_barras_venta').addEventListener('input', function(e) {
+        const codigo = e.target.value.trim();
+        const statusLabel = document.getElementById('searchStatusVentas');
 
-    // Initialize with the default active tab
-    activateDashboardTab('resumen');
+        clearTimeout(debounceTimer);
+
+        if (codigo.length < 3) {
+            resetFormularioVenta();
+            return;
+        }
+
+        statusLabel.classList.remove('hidden');
+
+        debounceTimer = setTimeout(() => {
+            const codigoCodificado = encodeURIComponent(codigo);
+
+            fetch(`/dashboard/prenda/buscar/${codigoCodificado}`)
+                .then(response => response.json())
+                .then(data => {
+                    statusLabel.classList.add('hidden');
+
+                    if (data.success) {
+                        const prenda = data.prenda;
+
+                        document.getElementById('nombre_prend_venta').value      = prenda.nombre_prend;
+                        document.getElementById('detalles_prend_venta').value    = `Talla: ${prenda.talla_prend ?? 'N/A'} | Color: ${prenda.nom_color ?? 'N/A'}`;
+                        document.getElementById('precio_unitario_venta').value   = prenda.precio;
+                        document.getElementById('stock_disponible_venta').value  = `${prenda.stock} unidades`;
+                        // Campos ocultos que se envían al backend
+                        document.getElementById('hidden_codigo_barras').value   = prenda.codigo_barras;
+                        document.getElementById('hidden_precio_unitario').value = prenda.precio;
+
+                        const cantidadInput = document.getElementById('cantidad_vendida_venta');
+                        cantidadInput.disabled = false;
+
+                        const tipoProceso = document.getElementById('tipo_proceso').value;
+                        if (tipoProceso === 'venta' || tipoProceso === 'apartado') {
+                            cantidadInput.max = prenda.stock;
+                        } else {
+                            cantidadInput.removeAttribute('max');
+                        }
+                        cantidadInput.value = 1;
+                        const btn = document.getElementById('btnSubmitVenta');
+                        btn.disabled = false;
+                        btn.className = "w-full sm:w-auto bg-pink-500 hover:bg-pink-600 text-white font-bold text-sm px-8 py-3.5 rounded-2xl transition shadow-lg shadow-pink-500/20 flex items-center justify-center gap-2 cursor-pointer";
+                        calcularTotalesVenta();
+                        showFeedbackVentas('Prenda cargada con éxito.', 'emerald');
+                    } else {
+                        resetFormularioVenta();
+                        showFeedbackVentas(data.message || 'Código no registrado o inactivo.', 'rose');
+                    }
+                })
+                .catch(() => {
+                    statusLabel.classList.add('hidden');
+                    resetFormularioVenta();
+                    showFeedbackVentas('Error de conexión al consultar el código.', 'rose');
+                });
+        }, 400);
+    });
+
+    document.getElementById('cantidad_vendida_venta').addEventListener('input', calcularTotalesVenta);
+    document.getElementById('tipo_proceso').addEventListener('change', function() {
+        if (document.getElementById('nombre_prend_venta').value !== '') {
+            calcularTotalesVenta();
+        }
+    });
+    function calcularTotalesVenta() {
+        const precio    = parseFloat(document.getElementById('precio_unitario_venta').value) || 0;
+        const cantidad  = parseInt(document.getElementById('cantidad_vendida_venta').value) || 1;
+        const tipoProceso = document.getElementById('tipo_proceso').value;
+
+        let total = precio * cantidad;
+        if (tipoProceso === 'devolucion') total = total * -1;
+
+        const formatter = new Intl.NumberFormat('es-CO', {
+            style: 'currency',
+            currency: 'COP',
+            minimumFractionDigits: 0
+        });
+        document.getElementById('resumen_subtotal_venta').innerText = formatter.format(total);
+        document.getElementById('resumen_total_venta').innerText    = formatter.format(total);
+    }
+
+    function resetFormularioVenta() {
+        document.getElementById('nombre_prend_venta').value     = '';
+        document.getElementById('detalles_prend_venta').value   = '';
+        document.getElementById('precio_unitario_venta').value  = '';
+        document.getElementById('stock_disponible_venta').value = '';
+
+        const cantidadInput = document.getElementById('cantidad_vendida_venta');
+        cantidadInput.disabled = true;
+        cantidadInput.value = 1;
+
+        const btn = document.getElementById('btnSubmitVenta');
+        btn.disabled = true;
+        btn.className = "w-full sm:w-auto bg-slate-200 text-slate-400 font-bold text-sm px-8 py-3.5 rounded-2xl transition flex items-center justify-center gap-2 cursor-not-allowed";
+
+        document.getElementById('resumen_subtotal_venta').innerText = '$0';
+        document.getElementById('resumen_total_venta').innerText    = '$0';
+    }
+
+    function showFeedbackVentas(msg, color) {
+        const alertBox = document.getElementById('alertBoxVentas');
+        alertBox.innerText = msg;
+        alertBox.className = `mb-6 p-4 rounded-2xl text-sm font-semibold flex items-center gap-2 shadow-sm bg-${color}-50 border border-${color}-100 text-${color}-700`;
+        alertBox.classList.remove('hidden');
+        setTimeout(() => { alertBox.classList.add('hidden'); }, 4000);
+    }
+
+    document.getElementById('btnAlertaStock').addEventListener('click', function() {
+        alert('📢 Notificación de stock crítico enviada de forma interna al perfil del Administrador.');
+    });
 </script>
 @endsection

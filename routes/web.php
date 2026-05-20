@@ -3,10 +3,12 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductoController;
+use App\Http\Controllers\UsuarioController;
+use App\Http\Controllers\VentaController;
 
 /*
 |--------------------------------------------------------------------------
-| Rutas Públicas de la Aplicación
+| Rutas Públicas
 |--------------------------------------------------------------------------
 */
 
@@ -16,60 +18,65 @@ Route::get('/', function () {
 
 /*
 |--------------------------------------------------------------------------
-| Rutas de Autenticación (Login, Registro y Cierre de Sesión)
+| Autenticación
 |--------------------------------------------------------------------------
 */
 
-// Inicio de Sesión
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'storeLogin'])->name('login.store');
 
-// Registro de Nuevos Clientes
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register.show');
 Route::post('/register', [AuthController::class, 'storeRegister'])->name('register.store');
 
-// Desconexión
 Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
 /*
 |--------------------------------------------------------------------------
-| Rutas Protegidas para el Staff (Administradores y Empleados)
+| Staff (Administradores y Empleados)
 |--------------------------------------------------------------------------
 */
 
 Route::middleware(['auth.staff'])->group(function () {
-    
-    // Vista principal del Dashboard (Listado del Inventario)
+
+    // Dashboard principal
     Route::get('/dashboard', [ProductoController::class, 'index'])->name('dashboard.staff');
-    
-    // Operaciones CRUD para el Inventario de Prendas
+
+    // AJAX — buscar prenda por código de barras
+    Route::get('/dashboard/prenda/buscar/{codigo_barras}', [ProductoController::class, 'buscarPorCodigo'])->name('prenda.buscar');
+
+    // CRUD Prendas
     Route::post('/dashboard/prenda', [ProductoController::class, 'store'])->name('prenda.store');
-    Route::put('/dashboard/prenda/{id}', [ProductoController::class, 'update'])->name('prenda.update');
-    Route::delete('/dashboard/prenda/{id}', [ProductoController::class, 'destroy'])->name('prenda.destroy');
-    
+    Route::put('/dashboard/prenda/{codigo_barras}', [ProductoController::class, 'update'])->name('prenda.update');
+    Route::delete('/dashboard/prenda/{codigo_barras}', [ProductoController::class, 'destroy'])->name('prenda.destroy');
+
+    // Ventas / Operaciones
+    Route::post('/dashboard/venta', [VentaController::class, 'store'])->name('venta.store');
+
+    // CRUD Usuarios
+    Route::post('/dashboard/usuario', [UsuarioController::class, 'store'])->name('usuario.store');
+    Route::put('/dashboard/usuario/{id}', [UsuarioController::class, 'update'])->name('usuario.update');
+    Route::delete('/dashboard/usuario/{id}', [UsuarioController::class, 'destroy'])->name('usuario.destroy');
+
 });
 
 /*
 |--------------------------------------------------------------------------
-| Rutas Protegidas para Clientes Activos
+| Clientes
 |--------------------------------------------------------------------------
 */
 
 Route::middleware(['auth.client'])->group(function () {
-    
-    // Tienda Principal / Catálogo
+
     Route::get('/tienda', function () {
         return view('client.home');
     })->name('client.home');
-    
-    // Carrito de Compras
+
     Route::get('/carrito', function () {
         return view('client.cart');
     })->name('client.cart');
-    
-    // Perfil del Cliente
+
     Route::get('/perfil', function () {
         return view('client.profile');
     })->name('client.profile');
-    
+
 });
