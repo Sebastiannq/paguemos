@@ -407,7 +407,7 @@
                                 <tbody class="text-sm divide-y divide-pink-50">
                                     <tr>
                                         <td class="py-3 text-slate-500">2026-05-20 14:35</td>
-                                        <td class="py-3 font-medium text-slate-900">Chaqueta Cargo Y2K</td>
+                                        <td class="py-3 font-medium text-slate-900">Ejemplo 1 sin funcionamiento xd</td>
                                         <td class="py-3"><span class="bg-blue-100 text-blue-800 text-xs px-2.5 py-1 rounded-full font-medium">Apartado</span></td>
                                         <td class="py-3 text-slate-600">1 unidad</td>
                                         <td class="py-3 text-slate-500">Staff Admin</td>

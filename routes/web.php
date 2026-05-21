@@ -67,9 +67,7 @@ Route::middleware(['auth.staff'])->group(function () {
 
 Route::middleware(['auth.client'])->group(function () {
 
-    Route::get('/tienda', function () {
-        return view('client.home');
-    })->name('client.home');
+    Route::get('/tienda', [ProductoController::class, 'catalog'])->name('client.home');
 
     Route::get('/carrito', function () {
         return view('client.cart');

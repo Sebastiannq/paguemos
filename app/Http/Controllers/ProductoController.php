@@ -27,6 +27,29 @@ class ProductoController extends Controller
 
         return view('dashboard.staff', compact('prendas', 'ventas', 'usuarios', 'generos', 'tallas', 'colores'));
     }
+
+    /**
+     * Catálogo público de prendas para clientes
+     */
+    public function catalog()
+    {
+        $prendas = DB::table('prenda')
+            ->join('genero_prend', 'prenda.fk_id_genero', '=', 'genero_prend.id_genero_prend')
+            ->join('t_prendas', 'prenda.fk_idt_prendas', '=', 't_prendas.idt_prendas')
+            ->join('Color', 'prenda.fk_id_color', '=', 'Color.id_color')
+            ->select('prenda.*', 'genero_prend.tipo_genero', 't_prendas.talla_prend', 'Color.nom_color')
+            ->where('prenda.estado', 1)
+            ->orderBy('prenda.nombre_prend')
+            ->get()
+            ->map(function ($item) {
+                $item->imagen_url = $item->imagen_prend
+                    ? 'data:image/jpeg;base64,' . base64_encode($item->imagen_prend)
+                    : null;
+                return $item;
+            });
+
+        return view('client.home', compact('prendas'));
+    }
     /**
      * Guardar nueva Prenda
      */

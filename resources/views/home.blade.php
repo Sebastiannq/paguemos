@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -15,217 +15,232 @@
         }
     </style>
 </head>
-<body class="bg-white">
-    <!-- Navegación -->
+<body class="bg-white text-gray-900">
     <nav class="bg-white shadow-md sticky top-0 z-50">
-        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+        <div class="container mx-auto px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="text-3xl font-bebas leading-tight">
                 <span class="text-gray-900">PAGUE</span>
                 <span class="bg-gradient-to-r from-pink-400 to-pink-600 bg-clip-text text-transparent">MENOS</span>
             </div>
-            <div class="space-x-4">
-                <a href="{{ route('client.home') }}" class="bg-pink-100 text-pink-600 px-4 py-2 rounded hover:bg-pink-200 transition">Catálogo</a>
-                <a href="{{ route('login') }}" class="text-gray-700 hover:text-gray-900">Iniciar Sesión</a>
-                <a href="{{ route('register.show') }}" class="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded transition">Regístrate</a>
+            <div class="flex flex-wrap items-center gap-3">
+                <a href="{{ route('client.home') }}" class="px-5 py-2 border border-pink-200 text-pink-600 rounded-full hover:bg-pink-50 transition">Catálogo</a>
+                <a href="{{ route('login') }}" class="px-5 py-2 rounded-full text-gray-700 hover:bg-gray-100 transition">Iniciar Sesión</a>
+                <a href="{{ route('register.show') }}" class="px-5 py-2 rounded-full bg-pink-600 text-white hover:bg-pink-700 transition">Regístrate</a>
             </div>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section class="bg-gradient-to-r from-pink-600 to-pink-500 text-white py-20">
-        <div class="container mx-auto px-6 text-center">
-            <h1 class="text-6xl font-bebas mb-4 leading-tight">Pague Menos</h1>
-            <p class="text-xl text-pink-100 mb-8">La mejor moda al mejor precio</p>
-            <p class="text-lg text-pink-100 max-w-2xl mx-auto mb-8">
-                Descubre nuestra colección exclusiva de ropa y accesorios de alta calidad a precios increíbles. 
-                Ahora es el momento perfecto para renovar tu guardarropa.
-            </p>
-            <a href="{{ route('register.show') }}" class="bg-white text-pink-600 font-bold px-8 py-3 rounded-lg hover:bg-gray-100 transition text-lg">
-                Comenzar Ahora
-            </a>
-        </div>
-    </section>
-
-    <!-- Nuestra Historia (destacada) -->
-    <section class="py-16 bg-white">
-        <div class="container mx-auto px-6">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-                <div>
-                    <h2 class="text-4xl font-bebas text-gray-900 mb-4">Nuestra Historia</h2>
-                    <p class="text-gray-600 mb-4">Pague Menos nació de una idea simple: ofrecer moda de calidad sin sacrificar el bolsillo. Empezamos como un pequeño equipo que creía que la ropa accesible también podía ser estilosa y responsable.</p>
-                    <p class="text-gray-600 mb-4">Con el tiempo, colaboramos con fabricantes locales y diseñadores emergentes para crear colecciones pensadas en la comodidad, el estilo y la durabilidad. Hoy, nuestra familia crece cada día gracias a clientes que valoran la calidad y el precio justo.</p>
-                    <p class="text-gray-600">Nos importa la sostenibilidad y apoyamos prácticas responsables en nuestra cadena de suministro. Cada compra ayuda a impulsar talento local y prácticas más limpias en la industria.</p>
+    <header class="relative overflow-hidden bg-gradient-to-br from-pink-600 via-pink-500 to-pink-400 text-white">
+        <div class="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_top_left,_rgba(255,255,255,0.35),_transparent_28%),radial-gradient(circle_at_bottom_right,_rgba(255,255,255,0.15),_transparent_25%)]"></div>
+        <div class="container mx-auto px-6 py-24 relative z-10">
+            <div class="grid gap-10 lg:grid-cols-2 items-center">
+                <div class="space-y-8">
+                    <p class="inline-flex items-center gap-3 rounded-full bg-white/10 px-4 py-2 text-sm uppercase tracking-[0.35em] text-white/90 font-semibold">Moda accesible • Calidad real • Atención local</p>
+                    <h1 class="text-5xl md:text-6xl font-bebas leading-tight">Descubre el estilo que te queda bien sin pagar de más.</h1>
+                    <p class="max-w-2xl text-lg text-white/90">Encuentra prendas únicas con atención personalizada en tienda y precios especiales. Renovar tu armario ahora es fácil, cómodo y cercano.</p>
                 </div>
+                
+            </div>
+        </div>
+    </header>
+
+    <main class="space-y-20">
+        <section class="container mx-auto px-6 py-16">
+            <div class="grid gap-10 lg:grid-cols-2 lg:items-center">
                 <div>
-                    <div class="relative overflow-hidden rounded-3xl shadow-xl">
-                        <div id="storyCarousel" class="flex transition-transform duration-500">
-                            <img src="https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=placeholder" alt="Tienda" class="w-full h-96 object-cover flex-shrink-0 rounded-3xl">
-                            <img src="https://images.unsplash.com/photo-1541099649105-f69ad21f3246?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=placeholder" alt="Ropa" class="w-full h-96 object-cover flex-shrink-0 rounded-3xl">
-                            <img src="https://images.unsplash.com/photo-1514996937319-344454492b37?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=placeholder" alt="Accesorios" class="w-full h-96 object-cover flex-shrink-0 rounded-3xl">
+                    <span class="inline-flex rounded-full bg-pink-100 px-5 py-3 text-lg md:text-xl font-semibold uppercase tracking-[0.25em] text-pink-700">Nuestra historia</span>
+                    <h2 class="mt-6 text-5xl md:text-6xl font-bebas text-gray-900 leading-tight">De un local de barrio a un estilo auténtico</h2>
+                    <p class="mt-5 text-base md:text-lg text-gray-600 leading-relaxed">Pague Menos nació en un pequeño local cercano con la misión de ofrecer moda accesible, atención amable y prendas seleccionadas con cuidado. Queremos que cada visita a nuestra tienda sea una experiencia cercana y confiable.</p>
+                    <div class="mt-10 grid gap-4 sm:grid-cols-2">
+                        <div class="rounded-3xl border border-pink-100 bg-white p-6 shadow-sm transition-shadow duration-300 hover:shadow-lg">
+                            <h3 class="text-2xl font-semibold text-gray-900">Atención local</h3>
+                            <p class="mt-3 text-base text-gray-600">Recibe asesoría directa en tienda y encuentra las prendas que mejor te quedan.</p>
                         </div>
-                        <button id="prevStory" class="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 text-gray-800 rounded-full p-3 shadow hover:bg-white transition">
-                            ‹
-                        </button>
-                        <button id="nextStory" class="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 text-gray-800 rounded-full p-3 shadow hover:bg-white transition">
-                            ›
-                        </button>
-                        <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-                            <span class="story-dot w-3 h-3 rounded-full bg-white/70"></span>
-                            <span class="story-dot w-3 h-3 rounded-full bg-white/40"></span>
-                            <span class="story-dot w-3 h-3 rounded-full bg-white/40"></span>
+                        <div class="rounded-3xl border border-pink-100 bg-white p-6 shadow-sm transition-shadow duration-300 hover:shadow-lg">
+                            <h3 class="text-2xl font-semibold text-gray-900">Calidad responsable</h3>
+                            <p class="mt-3 text-base text-gray-600">Seleccionamos ropa cómoda y duradera pensada para tu día a día.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="grid gap-6 sm:grid-cols-2">
+                    <div class="rounded-[2rem] bg-white p-8 shadow-2xl shadow-pink-200/50">
+                        <p class="text-sm uppercase tracking-[0.35em] text-pink-500">Valores</p>
+                        <h3 class="mt-4 text-3xl font-semibold text-gray-900">Cercanía y confianza</h3>
+                        <p class="mt-4 text-sm leading-relaxed text-gray-600">Creemos en el comercio local, en precios claros y en un trato honesto con cada cliente.</p>
+                    </div>
+                    <div class="rounded-[2rem] bg-pink-600 p-8 text-white shadow-2xl shadow-pink-500/20">
+                        <p class="text-sm uppercase tracking-[0.35em] text-pink-100">Tienda local</p>
+                        <h3 class="mt-4 text-3xl font-semibold">Compra en tienda</h3>
+                        <p class="mt-4 text-sm leading-relaxed text-pink-100/90">Visítanos y pruébate las prendas en persona. Aquí tenemos lo mejor para que te lleves lo que realmente te queda bien.</p>
+                    </div>
+                    <div class="rounded-[2rem] bg-pink-50 p-8 shadow-2xl shadow-pink-200/40">
+                        <p class="text-sm uppercase tracking-[0.35em] text-pink-500">Asesoría</p>
+                        <h3 class="mt-4 text-3xl font-semibold text-gray-900">Te ayudamos a elegir</h3>
+                        <p class="mt-4 text-sm leading-relaxed text-gray-600">Nuestro equipo está listo para mostrarte opciones según tu estilo, talla y ocasión. Ven y descubre tu próximo look favorito.</p>
+                    </div>
+                    <div class="rounded-[2rem] bg-white p-8 shadow-2xl shadow-pink-200/40">
+                        <p class="text-sm uppercase tracking-[0.35em] text-pink-500">Prueba cómoda</p>
+                        <h3 class="mt-4 text-3xl font-semibold text-gray-900">Sin apuros ni presión</h3>
+                        <p class="mt-4 text-sm leading-relaxed text-gray-600">Siente la tranquilidad de probar varias opciones en un ambiente relajado, con atención amable y sin prisas.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-white py-16">
+            <div class="container mx-auto px-6">
+                <div class="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+                    <div>
+                        <p class="uppercase tracking-[0.35em] text-pink-500 font-semibold">Nuestra historia</p>
+                        <h2 class="mt-4 text-4xl font-bebas text-gray-900">Un recorrido de estilo y servicio cercano</h2>
+                    </div>
+                </div>
+                <div class="mt-10 grid gap-6 lg:grid-cols-[1.6fr_1fr]">
+                    <div class="overflow-hidden rounded-[2rem] bg-gray-100 p-4 shadow-xl">
+                        <div id="storyCarousel" class="relative overflow-hidden rounded-[2rem]">
+                            <div id="storyTrack" class="flex transition-transform duration-500 will-change-transform">
+                                <div class="min-w-full flex-shrink-0">
+                                    <img src="https://images.unsplash.com/photo-1521334884684-d80222895322?q=80&w=1200&auto=format&fit=crop" alt="Tienda de ropa" class="h-96 w-full object-cover">
+                                </div>
+                                <div class="min-w-full flex-shrink-0">
+                                    <img src="https://images.unsplash.com/photo-1541099649105-f69ad21f3246?q=80&w=1200&auto=format&fit=crop" alt="Ropa en exhibición" class="h-96 w-full object-cover">
+                                </div>
+                                <div class="min-w-full flex-shrink-0">
+                                    <img src="https://images.unsplash.com/photo-1514996937319-344454492b37?q=80&w=1200&auto=format&fit=crop" alt="Clientes felices" class="h-96 w-full object-cover">
+                                </div>
+                            </div>
+                            <button id="prevStory" class="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-white/90 p-3 text-gray-800 shadow hover:bg-white transition">‹</button>
+                            <button id="nextStory" class="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-white/90 p-3 text-gray-800 shadow hover:bg-white transition">›</button>
+                        </div>
+                    </div>
+                    <div class="space-y-6 rounded-[2rem] bg-gray-50 p-8 shadow-xl">
+                        <div>
+                            <h3 class="text-2xl font-semibold text-gray-900">De dónde venimos</h3>
+                            <p class="mt-4 text-gray-600 leading-relaxed">Empezamos como un local de barrio con la idea de ofrecer moda asequible y un servicio cálido. Cada prenda se elige con atención para que puedas vestir bien sin sacrificar tu presupuesto.</p>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-semibold text-gray-900">Qué defendemos</h3>
+                            <p class="mt-4 text-gray-600 leading-relaxed">Valoramos la transparencia, el respeto por nuestros clientes y el apoyo al comercio local. Aquí encuentras un lugar donde te escuchamos y te ayudamos a elegir.</p>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-semibold text-gray-900">Qué ofrecemos</h3>
+                            <p class="mt-4 text-gray-600 leading-relaxed">Prendas cómodas, con estilo y disponibles para que las pruebes en tienda. Si buscas asesoría personal y una experiencia cercana, este es tu lugar.</p>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
+
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-                const carousel = document.getElementById('storyCarousel');
-                const dots = Array.from(document.querySelectorAll('.story-dot'));
-                let index = 0;
-                const total = carousel.children.length;
+                const track = document.getElementById('storyTrack');
+                const slideElements = Array.from(track.children);
+                const totalSlides = slideElements.length;
+                if (totalSlides === 0) return;
 
-                function updateCarousel() {
-                    carousel.style.transform = 'translateX(-' + index * 100 + '%)';
-                    dots.forEach((dot, i) => {
-                        dot.classList.toggle('bg-white/70', i === index);
-                        dot.classList.toggle('bg-white/40', i !== index);
-                    });
+                const firstClone = slideElements[0].cloneNode(true);
+                const lastClone = slideElements[totalSlides - 1].cloneNode(true);
+                track.appendChild(firstClone);
+                track.insertBefore(lastClone, slideElements[0]);
+
+                let index = 1;
+                track.style.transform = `translateX(-${index * 100}%)`;
+
+                const prevButton = document.getElementById('prevStory');
+                const nextButton = document.getElementById('nextStory');
+                let autoAdvance = null;
+
+                function moveTo(targetIndex) {
+                    track.style.transition = 'transform 0.5s ease';
+                    index = targetIndex;
+                    track.style.transform = `translateX(-${index * 100}%)`;
                 }
 
-                document.getElementById('prevStory').addEventListener('click', function() {
-                    index = (index - 1 + total) % total;
-                    updateCarousel();
+                function startAutoAdvance() {
+                    autoAdvance = setInterval(() => moveTo(index + 1), 5000);
+                }
+
+                function resetAutoAdvance() {
+                    if (autoAdvance) {
+                        clearInterval(autoAdvance);
+                    }
+                    startAutoAdvance();
+                }
+
+                prevButton.addEventListener('click', function() {
+                    moveTo(index - 1);
+                    resetAutoAdvance();
                 });
 
-                document.getElementById('nextStory').addEventListener('click', function() {
-                    index = (index + 1) % total;
-                    updateCarousel();
+                nextButton.addEventListener('click', function() {
+                    moveTo(index + 1);
+                    resetAutoAdvance();
                 });
 
-                setInterval(function() {
-                    index = (index + 1) % total;
-                    updateCarousel();
-                }, 5000);
+                track.addEventListener('transitionend', function() {
+                    if (index === 0) {
+                        track.style.transition = 'none';
+                        index = totalSlides;
+                        track.style.transform = `translateX(-${index * 100}%)`;
+                    }
+                    if (index === totalSlides + 1) {
+                        track.style.transition = 'none';
+                        index = 1;
+                        track.style.transform = `translateX(-${index * 100}%)`;
+                    }
+                });
+
+                startAutoAdvance();
             });
         </script>
-    </section>
 
-    <!-- Características -->
-    <section class="py-16 bg-gray-50">
-        <div class="container mx-auto px-6">
-            <h2 class="text-4xl font-bebas text-center text-gray-900 mb-12">¿Por Qué Elegirnos?</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="bg-white p-8 rounded-lg shadow-md text-center hover:shadow-lg transition">
-                    <div class="text-5xl mb-4">💰</div>
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">Precios Increíbles</h3>
-                    <p class="text-gray-600">
-                        Ofertas exclusivas con descuentos de hasta 50% en moda de calidad
-                    </p>
-                </div>
-
-                <div class="bg-white p-8 rounded-lg shadow-md text-center hover:shadow-lg transition">
-                    <div class="text-5xl mb-4">🚚</div>
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">Envío Rápido</h3>
-                    <p class="text-gray-600">
-                        Entrega garantizada en 3-5 días hábiles a todo el país
-                    </p>
-                </div>
-
-                <div class="bg-white p-8 rounded-lg shadow-md text-center hover:shadow-lg transition">
-                    <div class="text-5xl mb-4">✨</div>
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">Calidad Garantizada</h3>
-                    <p class="text-gray-600">
-                        Productos premium con garantía de satisfacción o devolvemos tu dinero
-                    </p>
-                </div>
+        <section class="bg-gradient-to-r from-pink-600 to-pink-700 text-white py-20">
+            <div class="container mx-auto px-6 text-center">
+                <p class="text-sm uppercase tracking-[0.35em] text-pink-100">Hazlo tuyo</p>
+                <h2 class="mt-5 text-5xl font-bebas">Comienza a ahorrar con estilo</h2>
+                <p class="mt-5 max-w-3xl mx-auto text-lg text-pink-100/90">Regístrate y recibe ofertas exclusivas, lanzamientos especiales y ventajas para tu primer pedido.</p>
+                <a href="{{ route('register.show') }}" class="mt-10 inline-flex items-center justify-center rounded-full bg-white px-10 py-4 text-lg font-semibold text-pink-600 shadow-lg shadow-pink-500/20 hover:bg-gray-100 transition">Crear Cuenta Ahora</a>
             </div>
-        </div>
-    </section>
+        </section>
+    </main>
 
-    <!-- Categorías Destacadas -->
-    <section class="py-16">
-        <div class="container mx-auto px-6">
-            <h2 class="text-4xl font-bebas text-center text-gray-900 mb-12">Nuestras Categorías</h2>
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div class="bg-gradient-to-br from-pink-400 to-pink-600 rounded-lg p-8 text-white text-center hover:shadow-lg transition cursor-pointer">
-                    <div class="text-6xl mb-4">👔</div>
-                    <h3 class="text-xl font-bold">Ropa Casual</h3>
-                    <p class="text-pink-100 mt-2">Cómodidad en cada prenda</p>
-                </div>
-
-                <div class="bg-gradient-to-br from-pink-500 to-pink-700 rounded-lg p-8 text-white text-center hover:shadow-lg transition cursor-pointer">
-                    <div class="text-6xl mb-4">👗</div>
-                    <h3 class="text-xl font-bold">Ropa Formal</h3>
-                    <p class="text-pink-100 mt-2">Elegancia garantizada</p>
-                </div>
-
-                <div class="bg-gradient-to-br from-pink-300 to-pink-500 rounded-lg p-8 text-white text-center hover:shadow-lg transition cursor-pointer">
-                    <div class="text-6xl mb-4">👞</div>
-                    <h3 class="text-xl font-bold">Calzado</h3>
-                    <p class="text-pink-100 mt-2">Estilo desde los pies</p>
-                </div>
-
-                <div class="bg-gradient-to-br from-gray-700 to-gray-900 rounded-lg p-8 text-white text-center hover:shadow-lg transition cursor-pointer">
-                    <div class="text-6xl mb-4">👒</div>
-                    <h3 class="text-xl font-bold">Accesorios</h3>
-                    <p class="text-gray-300 mt-2">Complementos únicos</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Llamada a Acción -->
-    <section class="bg-gradient-to-r from-pink-600 to-pink-700 text-white py-16">
-        <div class="container mx-auto px-6 text-center">
-            <h2 class="text-5xl font-bebas mb-4">¿Listo para Pagar Menos?</h2>
-            <p class="text-xl text-pink-100 mb-8">Únete a miles de clientes satisfechos hoy mismo</p>
-            <a href="{{ route('register.show') }}" class="bg-white text-pink-600 font-bold px-8 py-3 rounded-lg hover:bg-gray-100 transition text-lg">
-                Crear Cuenta Ahora
-            </a>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="bg-gray-800 text-white py-12">
-        <div class="container mx-auto px-6">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+    <footer class="bg-gray-900 text-white">
+        <div class="container mx-auto px-6 py-16">
+            <div class="grid gap-10 lg:grid-cols-4">
                 <div>
-                    <h3 class="text-lg font-bold mb-4">Pague Menos</h3>
-                    <p class="text-gray-400">Moda a los mejores precios</p>
+                    <h3 class="text-xl font-bebas mb-4">PAGUE MENOS</h3>
+                    <p class="text-gray-400">Tu tienda de moda en línea con los mejores precios y las tendencias más frescas.</p>
                 </div>
                 <div>
-                    <h3 class="text-lg font-bold mb-4">Categorías</h3>
-                    <ul class="text-gray-400 space-y-2">
-                        <li><a href="#" class="hover:text-white transition">Ropa Casual</a></li>
-                        <li><a href="#" class="hover:text-white transition">Ropa Formal</a></li>
-                        <li><a href="#" class="hover:text-white transition">Calzado</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h3 class="text-lg font-bold mb-4">Compañía</h3>
-                    <ul class="text-gray-400 space-y-2">
+                    <h4 class="mb-4 font-semibold text-white">Compañía</h4>
+                    <ul class="space-y-3 text-gray-400">
                         <li><a href="#" class="hover:text-white transition">Sobre Nosotros</a></li>
                         <li><a href="#" class="hover:text-white transition">Contacto</a></li>
                         <li><a href="#" class="hover:text-white transition">Blog</a></li>
                     </ul>
                 </div>
                 <div>
-                    <h3 class="text-lg font-bold mb-4">Síguenos</h3>
-                    <p class="text-gray-400">
-                        <a href="#" class="hover:text-white transition">Facebook</a> | 
-                        <a href="#" class="hover:text-white transition">Instagram</a> | 
-                        <a href="#" class="hover:text-white transition">Twitter</a>
-                    </p>
+                    <h4 class="mb-4 font-semibold text-white">Ayuda</h4>
+                    <ul class="space-y-3 text-gray-400">
+                        <li><a href="#" class="hover:text-white transition">Preguntas frecuentes</a></li>
+                        <li><a href="#" class="hover:text-white transition">Cómo comprar</a></li>
+                        <li><a href="#" class="hover:text-white transition">Devoluciones</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="mb-4 font-semibold text-white">Síguenos</h4>
+                    <ul class="space-y-3 text-gray-400">
+                        <li><a href="#" class="hover:text-white transition">Facebook</a></li>
+                        <li><a href="#" class="hover:text-white transition">Instagram</a></li>
+                        <li><a href="#" class="hover:text-white transition">Twitter</a></li>
+                    </ul>
                 </div>
             </div>
-            <div class="border-t border-gray-700 pt-8">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <p class="text-gray-400">&copy; 2024 Pague Menos. Todos los derechos reservados.</p>
-                    <p class="text-gray-400 text-right">
-                        <a href="#" class="hover:text-white transition">Privacidad</a> | 
-                        <a href="#" class="hover:text-white transition">Términos</a>
-                    </p>
+            <div class="mt-12 border-t border-white/10 pt-8 text-sm text-gray-500 flex flex-col gap-3 md:flex-row md:justify-between">
+                <p>&copy; 2026 Pague Menos. Todos los derechos reservados.</p>
+                <div class="flex flex-wrap gap-3">
+                    <a href="#" class="hover:text-white transition">Privacidad</a>
+                    <a href="#" class="hover:text-white transition">Términos</a>
                 </div>
             </div>
         </div>

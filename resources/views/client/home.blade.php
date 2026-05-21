@@ -67,73 +67,36 @@
 
         <!-- Productos Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <!-- Producto 1 -->
-            <div class="bg-white rounded-lg shadow overflow-hidden hover:shadow-lg transition">
-                <div class="bg-gray-300 h-48 flex items-center justify-center">
-                    👕
-                </div>
-                <div class="p-4">
-                    <h3 class="font-bold text-gray-900 mb-2">Camiseta Básica</h3>
-                    <p class="text-gray-600 text-sm mb-4">Algodón 100% puro, cómoda y durable</p>
-                    <div class="flex justify-between items-center">
-                        <span class="text-2xl font-bold text-pink-600">$25.99</span>
-                        <button class="px-4 py-2 bg-pink-600 text-white rounded hover:bg-pink-700 transition">
-                            Agregar
-                        </button>
+            @forelse($prendas as $prenda)
+                <div class="bg-white rounded-lg shadow overflow-hidden hover:shadow-lg transition">
+                    <div class="h-56 bg-gray-100 overflow-hidden flex items-center justify-center">
+                        @if($prenda->imagen_url)
+                            <img src="{{ $prenda->imagen_url }}" alt="{{ $prenda->nombre_prend }}" class="w-full h-full object-cover">
+                        @else
+                            <div class="text-6xl">👕</div>
+                        @endif
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-bold text-gray-900 mb-2">{{ $prenda->nombre_prend }}</h3>
+                        <p class="text-gray-600 text-sm mb-2">{{ $prenda->descripcion_prend }}</p>
+                        <div class="space-y-1 mb-4 text-sm text-gray-600">
+                            <p class="font-semibold text-base">Género: {{ $prenda->tipo_genero ?? 'N/A' }}</p>
+                            <p class="font-semibold text-base">Talla: {{ $prenda->talla_prend ?? 'N/A' }}</p>
+                            <p class="font-semibold text-base">Color: {{ $prenda->nom_color ?? 'N/A' }}</p>
+                        </div>
+                        <div class="flex items-center justify-between gap-3">
+                            <span class="text-2xl font-bold text-pink-600">${{ number_format($prenda->precio, 2, ',', '.') }}</span>
+                            <button class="px-4 py-2 bg-pink-600 text-white rounded hover:bg-pink-700 transition">
+                                Agregar
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- Producto 2 -->
-            <div class="bg-white rounded-lg shadow overflow-hidden hover:shadow-lg transition">
-                <div class="bg-gray-300 h-48 flex items-center justify-center">
-                    👖
+            @empty
+                <div class="col-span-full p-10 bg-white rounded-lg shadow text-center text-gray-500">
+                    No hay prendas registradas en el catálogo.
                 </div>
-                <div class="p-4">
-                    <h3 class="font-bold text-gray-900 mb-2">Jeans Clásico</h3>
-                    <p class="text-gray-600 text-sm mb-4">Azul oscuro, corte moderno y cómodo</p>
-                    <div class="flex justify-between items-center">
-                        <span class="text-2xl font-bold text-pink-600">$49.99</span>
-                        <button class="px-4 py-2 bg-pink-600 text-white rounded hover:bg-pink-700 transition">
-                            Agregar
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Producto 3 -->
-            <div class="bg-white rounded-lg shadow overflow-hidden hover:shadow-lg transition">
-                <div class="bg-gray-300 h-48 flex items-center justify-center">
-                    🧥
-                </div>
-                <div class="p-4">
-                    <h3 class="font-bold text-gray-900 mb-2">Chaqueta Deportiva</h3>
-                    <p class="text-gray-600 text-sm mb-4">Impermeable y transpirable, perfecta para el clima</p>
-                    <div class="flex justify-between items-center">
-                        <span class="text-2xl font-bold text-pink-600">$89.99</span>
-                        <button class="px-4 py-2 bg-pink-600 text-white rounded hover:bg-pink-700 transition">
-                            Agregar
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Producto 4 -->
-            <div class="bg-white rounded-lg shadow overflow-hidden hover:shadow-lg transition">
-                <div class="bg-gray-300 h-48 flex items-center justify-center">
-                    👟
-                </div>
-                <div class="p-4">
-                    <h3 class="font-bold text-gray-900 mb-2">Zapatillas Urbanas</h3>
-                    <p class="text-gray-600 text-sm mb-4">Cómodas y de moda para el día a día</p>
-                    <div class="flex justify-between items-center">
-                        <span class="text-2xl font-bold text-pink-600">$79.99</span>
-                        <button class="px-4 py-2 bg-pink-600 text-white rounded hover:bg-pink-700 transition">
-                            Agregar
-                        </button>
-                    </div>
-                </div>
-            </div>
+            @endforelse
         </div>
 
         <!-- Más Productos -->
