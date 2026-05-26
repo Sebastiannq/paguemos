@@ -869,5 +869,39 @@
     document.getElementById('btnAlertaStock').addEventListener('click', function() {
         alert('📢 Notificación de stock crítico enviada de forma interna al perfil del Administrador.');
     });
+    document.getElementById('codigo_barras_crear').addEventListener('input', function() {
+    const codigo = this.value.trim();
+    const errorMsg = document.getElementById('error_codigo_existente');
+    const submitBtn = this.closest('form').querySelector('button[type="submit"]');
+
+    if (codigo.length < 2) {
+        errorMsg.classList.add('hidden');
+        if(submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+        return;
+    }
+
+    // Llama directamente a la nueva ruta que mapeamos en web.php
+    fetch(`/dashboard/prenda/verificar-codigo?codigo=${encodeURIComponent(codigo)}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.existe) {
+                errorMsg.classList.remove('hidden'); // Muestra la alerta de "Ya registrado"
+                if(submitBtn) {
+                    submitBtn.disabled = true; // Bloquea el guardado
+                    submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                }
+            } else {
+                errorMsg.classList.add('hidden'); // Oculta el error si está libre
+                if(submitBtn) {
+                    submitBtn.disabled = false; // Desbloquea el botón
+                    submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                }
+            }
+        })
+        .catch(err => console.error("Error al validar código:", err));
+});
 </script>
 @endsection

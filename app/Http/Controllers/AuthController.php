@@ -11,7 +11,6 @@ class AuthController extends Controller
 {
     public function showLogin()
     {
-        // Carga la vista directamente sin anteponer condiciones que generen bucles
         return view('login');
     }
 
@@ -34,7 +33,8 @@ class AuthController extends Controller
                 ->select('rol.nom_rol')
                 ->first();
 
-            $userRole = $rolData ? $rolData->nom_rol : 'cliente';
+            // Pasamos a minúsculas para evitar problemas de mayúsculas/minúsculas
+            $userRole = $rolData ? strtolower($rolData->nom_rol) : 'cliente';
 
             if (Hash::check($validated['password'], $user->contrasena)) {
                 session([
@@ -44,9 +44,16 @@ class AuthController extends Controller
                     'user_role' => $userRole
                 ]);
 
-                if ($userRole === 'administrador' || $userRole === 'empleado') {
-                    return redirect()->route('dashboard.staff')->with('success', 'Bienvenido');
+    
+
+                // REDIRECCIÓN INTELIGENTE SEGÚN EL ROL
+                if ($userRole === 'administrador') {
+                    return redirect()->route('dashboard.staff')->with('success', 'Bienvenido Administrador');
+                } elseif ($userRole === 'empleado') {
+                    // Redirige a la ruta que definiremos para el empleado
+                    return redirect()->route('empleado.home')->with('success', 'Bienvenido al Panel de Ventas');
                 }
+
                 return redirect()->route('client.home');
             }
         }
@@ -71,7 +78,6 @@ class AuthController extends Controller
         ]);
 
         $user = DB::transaction(function () use ($validated) {
-            // 1. Crear el usuario (id_usuario es AUTO_INCREMENT en MySQL)
             $nuevoUsuario = User::create([
                 'primer_nom'    => $validated['primer_nom'],
                 'segund_nom'    => $validated['segund_nom'],
@@ -83,14 +89,12 @@ class AuthController extends Controller
                 'fecha_ingreso' => now()
             ]);
 
-            // 2. Asignar el Rol de Cliente (id_rol 3 en tu tabla rol)
             $idRolCliente = 3; 
             DB::table('usuario_rol')->insert([
                 'fkpk_id_usuario' => $nuevoUsuario->id_usuario,
                 'fkpk_id_rol'     => $idRolCliente
             ]);
 
-            // 3. Crear el registro en la tabla extendida 'cliente'
             DB::table('cliente')->insert([
                 'fkpk_id_cliente' => $nuevoUsuario->id_usuario,
                 'img_cliente'     => '' 

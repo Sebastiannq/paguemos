@@ -38,10 +38,18 @@ Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware(['auth.staff'])->group(function () {
 
-    // Dashboard principal
+    // Dashboard Principal (Administrador)
     Route::get('/dashboard', [ProductoController::class, 'index'])->name('dashboard.staff');
 
-    // AJAX — buscar prenda por código de barras
+    // NUEVA: Dashboard Exclusivo para Empleados
+    Route::get('/empleado/home', [ProductoController::class, 'indexEmpleado'])->name('empleado.home');
+    // Ruta para guardar un apartado desde el panel del empleado
+Route::post('/empleado/apartados/guardar', [ProductoController::class, 'storeApartado'])->name('apartados.store');
+
+    // NUEVA: AJAX — Verificar si un código de barras ya existe al crear producto
+    Route::get('/dashboard/prenda/verificar-codigo', [ProductoController::class, 'verificarCodigo'])->name('prenda.verificar');
+
+    // AJAX — Buscar prenda por código de barras (Para el módulo de ventas/apartados)
     Route::get('/dashboard/prenda/buscar/{codigo_barras}', [ProductoController::class, 'buscarPorCodigo'])->name('prenda.buscar');
 
     // CRUD Prendas
@@ -78,3 +86,6 @@ Route::middleware(['auth.client'])->group(function () {
     })->name('client.profile');
 
 });
+
+Route::get('/dashboard/prenda/buscar/{codigo_barras}', [ProductoController::class, 'buscarPorCodigo']);
+Route::get('/dashboard/cliente/buscar/{correo}', [ProductoController::class, 'buscarClientePorCorreo']);
