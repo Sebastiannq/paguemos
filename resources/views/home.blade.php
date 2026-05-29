@@ -24,8 +24,14 @@
             </div>
             <div class="flex flex-wrap items-center gap-3">
                 <a href="{{ route('client.home') }}" class="px-5 py-2 border border-pink-200 text-pink-600 rounded-full hover:bg-pink-50 transition">Catálogo</a>
-                <a href="{{ route('login') }}" class="px-5 py-2 rounded-full text-gray-700 hover:bg-gray-100 transition">Iniciar Sesión</a>
-                <a href="{{ route('register.show') }}" class="px-5 py-2 rounded-full bg-pink-600 text-white hover:bg-pink-700 transition">Regístrate</a>
+                @if(session('user_name'))
+                    <a href="{{ route('client.profile') }}" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 transition font-medium">👤 Perfil</a>
+                    <span class="px-4 py-2 rounded-lg bg-pink-100 text-pink-700 font-semibold">{{ session('user_name') }}</span>
+                    <a href="{{ route('logout') }}" class="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition font-medium">Salir</a>
+                @else
+                    <a href="{{ route('login') }}" class="px-5 py-2 rounded-full text-gray-700 hover:bg-gray-100 transition">Iniciar Sesión</a>
+                    <a href="{{ route('register.show') }}" class="px-5 py-2 rounded-full bg-pink-600 text-white hover:bg-pink-700 transition">Regístrate</a>
+                @endif
             </div>
         </div>
     </nav>

@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\FacturaController;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\VentaController;
@@ -59,6 +60,12 @@ Route::post('/empleado/apartados/guardar', [ProductoController::class, 'storeApa
 
     // Ventas / Operaciones
     Route::post('/dashboard/venta', [VentaController::class, 'store'])->name('venta.store');
+    Route::get('/dashboard/ventas', [VentaController::class, 'index'])->name('dashboard.ventas');
+
+    // Facturas
+    Route::get('/dashboard/facturas', [FacturaController::class, 'indexAdmin'])->name('dashboard.facturas');
+    Route::get('/dashboard/facturas/{id}', [FacturaController::class, 'showAdmin'])->name('dashboard.facturas.show');
+    Route::post('/dashboard/facturas/{id}/aceptar', [FacturaController::class, 'accept'])->name('dashboard.facturas.accept');
 
     // CRUD Usuarios
     Route::post('/dashboard/usuario', [UsuarioController::class, 'store'])->name('usuario.store');
@@ -75,11 +82,16 @@ Route::post('/empleado/apartados/guardar', [ProductoController::class, 'storeApa
 
 Route::middleware(['auth.client'])->group(function () {
 
-    Route::get('/tienda', [ProductoController::class, 'catalog'])->name('client.home');
+    Route::get('/inicio', function () {
+        return view('home');
+    })->name('client.inicio');
 
+    Route::get('/tienda', [ProductoController::class, 'catalog'])->name('client.home');
     Route::get('/carrito', function () {
         return view('client.cart');
     })->name('client.cart');
+    Route::get('/checkout', [FacturaController::class, 'showCheckout'])->name('client.checkout');
+    Route::post('/checkout', [FacturaController::class, 'store'])->name('client.checkout.store');
 
     Route::get('/perfil', function () {
         return view('client.profile');

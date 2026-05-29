@@ -61,6 +61,32 @@
                     auto-completar los datos de venta de forma inmediata.</p>
             </header>
 
+            @if(isset($acceptedInvoice))
+                <div class="mb-8 rounded-[2rem] border border-pink-100 bg-white p-6 shadow-sm">
+                    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                            <p class="text-xs uppercase tracking-[0.35em] text-pink-500 font-bold">Factura aceptada</p>
+                            <h3 class="mt-2 text-2xl font-black text-slate-900">Pedido #{{ $acceptedInvoice->id }}</h3>
+                            <p class="text-sm text-slate-500">Cliente: {{ $acceptedInvoice->cliente_nombre }} / {{ $acceptedInvoice->cliente_email }}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-xs uppercase tracking-[0.35em] text-slate-500">Total</p>
+                            <p class="mt-1 text-3xl font-black text-pink-600">${{ number_format($acceptedInvoice->total, 2, ',', '.') }}</p>
+                        </div>
+                    </div>
+                    <div class="mt-6 grid gap-4 md:grid-cols-2">
+                        <div class="rounded-3xl bg-slate-50 p-4">
+                            <p class="text-xs uppercase tracking-[0.35em] text-slate-500 font-semibold">Cédula</p>
+                            <p class="mt-2 text-sm text-slate-700">{{ $acceptedInvoice->cedula }}</p>
+                        </div>
+                        <div class="rounded-3xl bg-slate-50 p-4">
+                            <p class="text-xs uppercase tracking-[0.35em] text-slate-500 font-semibold">Empleado</p>
+                            <p class="mt-2 text-sm text-slate-700">{{ $acceptedInvoice->empleado_registra }}</p>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
 
                 <div class="lg:col-span-2 bg-white border border-slate-100 p-8 rounded-[2rem] shadow-sm space-y-6">

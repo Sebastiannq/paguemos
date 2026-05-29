@@ -510,12 +510,12 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div class="space-y-1">
                     <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Precio (COP) *</label>
-                    <input type="number" name="precio" required min="0" placeholder="0"
+                    <input type="number" name="precio" required min="10000" placeholder="10000"
                         class="w-full rounded-2xl border border-pink-100 bg-white px-4 py-3 text-sm font-mono text-slate-800 outline-none focus:border-pink-300 focus:ring-2 focus:ring-pink-100 transition" />
                 </div>
                 <div class="space-y-1">
                     <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Stock Inicial *</label>
-                    <input type="number" name="stock" required min="0" placeholder="0"
+                    <input type="number" name="stock" required min="10" placeholder="10"
                         class="w-full rounded-2xl border border-pink-100 bg-white px-4 py-3 text-sm font-mono text-slate-800 outline-none focus:border-pink-300 focus:ring-2 focus:ring-pink-100 transition" />
                 </div>
             </div>
@@ -523,12 +523,12 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div class="space-y-1">
                     <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Stock Mínimo *</label>
-                    <input type="number" name="min_stock" required min="0" placeholder="0"
+                    <input type="number" name="min_stock" required min="15" placeholder="15"
                         class="w-full rounded-2xl border border-pink-100 bg-white px-4 py-3 text-sm font-mono text-slate-800 outline-none focus:border-pink-300 focus:ring-2 focus:ring-pink-100 transition" />
                 </div>
                 <div class="space-y-1">
                     <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Stock Máximo *</label>
-                    <input type="number" name="max_stock" required min="0" placeholder="0"
+                    <input type="number" name="max_stock" required min="20" placeholder="20"
                         class="w-full rounded-2xl border border-pink-100 bg-white px-4 py-3 text-sm font-mono text-slate-800 outline-none focus:border-pink-300 focus:ring-2 focus:ring-pink-100 transition" />
                 </div>
             </div>
@@ -624,12 +624,12 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div class="space-y-1">
                     <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Precio (COP) *</label>
-                    <input type="number" id="edit_precio" name="precio" required min="0"
+                    <input type="number" id="edit_precio" name="precio" required min="10000"
                         class="w-full rounded-2xl border border-pink-100 bg-white px-4 py-3 text-sm font-mono text-slate-800 outline-none focus:border-pink-300 focus:ring-2 focus:ring-pink-100 transition" />
                 </div>
                 <div class="space-y-1">
                     <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Stock *</label>
-                    <input type="number" id="edit_stock" name="stock" required min="0"
+                    <input type="number" id="edit_stock" name="stock" required min="10"
                         class="w-full rounded-2xl border border-pink-100 bg-white px-4 py-3 text-sm font-mono text-slate-800 outline-none focus:border-pink-300 focus:ring-2 focus:ring-pink-100 transition" />
                 </div>
             </div>
@@ -637,12 +637,12 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div class="space-y-1">
                     <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Stock Mínimo *</label>
-                    <input type="number" id="edit_min_stock" name="min_stock" required min="0"
+                    <input type="number" id="edit_min_stock" name="min_stock" required min="15"
                         class="w-full rounded-2xl border border-pink-100 bg-white px-4 py-3 text-sm font-mono text-slate-800 outline-none focus:border-pink-300 focus:ring-2 focus:ring-pink-100 transition" />
                 </div>
                 <div class="space-y-1">
                     <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Stock Máximo *</label>
-                    <input type="number" id="edit_max_stock" name="max_stock" required min="0"
+                    <input type="number" id="edit_max_stock" name="max_stock" required min="20"
                         class="w-full rounded-2xl border border-pink-100 bg-white px-4 py-3 text-sm font-mono text-slate-800 outline-none focus:border-pink-300 focus:ring-2 focus:ring-pink-100 transition" />
                 </div>
             </div>

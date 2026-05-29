@@ -111,4 +111,18 @@ class VentaController extends Controller
 
         return redirect()->back()->with('success', $mensajes[$tipo] ?? 'Operación registrada.');
     }
+
+    public function index(Request $request)
+    {
+        $acceptedInvoice = null;
+
+        if ($request->has('factura_id')) {
+            $acceptedInvoice = DB::table('facturas')->where('id_factura', $request->query('factura_id'))->first();
+            if ($acceptedInvoice) {
+                $acceptedInvoice->items = DB::table('factura_prenda')->where('fkpk_id_factura', $acceptedInvoice->id_factura)->get();
+            }
+        }
+
+        return view('dashboard.ventas', compact('acceptedInvoice'));
+    }
 }

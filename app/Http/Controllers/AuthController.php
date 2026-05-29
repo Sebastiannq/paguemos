@@ -54,7 +54,7 @@ class AuthController extends Controller
                     return redirect()->route('empleado.home')->with('success', 'Bienvenido al Panel de Ventas');
                 }
 
-                return redirect()->route('client.home');
+                return redirect()->route('client.inicio');
             }
         }
 
