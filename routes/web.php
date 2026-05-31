@@ -68,6 +68,7 @@ Route::post('/empleado/apartados/guardar', [ProductoController::class, 'storeApa
     Route::post('/dashboard/facturas/{id}/aceptar', [FacturaController::class, 'accept'])->name('dashboard.facturas.accept');
 
     // CRUD Usuarios
+    Route::get('/dashboard/usuario/{id}', [UsuarioController::class, 'show'])->name('usuario.show');
     Route::post('/dashboard/usuario', [UsuarioController::class, 'store'])->name('usuario.store');
     Route::put('/dashboard/usuario/{id}', [UsuarioController::class, 'update'])->name('usuario.update');
     Route::delete('/dashboard/usuario/{id}', [UsuarioController::class, 'destroy'])->name('usuario.destroy');

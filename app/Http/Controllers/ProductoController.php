@@ -19,13 +19,19 @@ class ProductoController extends Controller
 
         // Agregamos las ventas para enviarlas al staff.blade.php
         $ventas = DB::table('venta')->orderBy('fecha_venta', 'desc')->get();
+        $totalVentas = DB::table('venta')->sum('total');
         
-        $usuarios = DB::table('users')->get();
+        // Traemos usuarios desde la tabla real 'usuario' y el rol (si existe)
+        $usuarios = DB::table('usuario')
+            ->leftJoin('usuario_rol', 'usuario.id_usuario', '=', 'usuario_rol.fkpk_id_usuario')
+            ->leftJoin('rol', 'usuario_rol.fkpk_id_rol', '=', 'rol.id_rol')
+            ->select('usuario.*', 'rol.nom_rol as role')
+            ->get();
         $generos  = DB::table('genero_prend')->get();
         $tallas   = DB::table('t_prendas')->get();
         $colores  = DB::table('Color')->get();
 
-        return view('dashboard.staff', compact('prendas', 'ventas', 'usuarios', 'generos', 'tallas', 'colores'));
+        return view('dashboard.staff', compact('prendas', 'ventas', 'totalVentas', 'usuarios', 'generos', 'tallas', 'colores'));
     }
 
     /**
