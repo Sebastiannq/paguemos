@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Prenda;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class ProductoController extends Controller
 {
@@ -19,19 +20,13 @@ class ProductoController extends Controller
 
         // Agregamos las ventas para enviarlas al staff.blade.php
         $ventas = DB::table('venta')->orderBy('fecha_venta', 'desc')->get();
-        $totalVentas = DB::table('venta')->sum('total');
         
-        // Traemos usuarios desde la tabla real 'usuario' y el rol (si existe)
-        $usuarios = DB::table('usuario')
-            ->leftJoin('usuario_rol', 'usuario.id_usuario', '=', 'usuario_rol.fkpk_id_usuario')
-            ->leftJoin('rol', 'usuario_rol.fkpk_id_rol', '=', 'rol.id_rol')
-            ->select('usuario.*', 'rol.nom_rol as role')
-            ->get();
+        $usuarios = DB::table('users')->get();
         $generos  = DB::table('genero_prend')->get();
         $tallas   = DB::table('t_prendas')->get();
         $colores  = DB::table('Color')->get();
 
-        return view('dashboard.staff', compact('prendas', 'ventas', 'totalVentas', 'usuarios', 'generos', 'tallas', 'colores'));
+        return view('dashboard.staff', compact('prendas', 'ventas', 'usuarios', 'generos', 'tallas', 'colores'));
     }
 
     /**
@@ -65,19 +60,28 @@ class ProductoController extends Controller
             'codigo_barras'     => 'required|string|max:50|unique:prenda,codigo_barras',
             'nombre_prend'      => 'required|string|max:25',
             'descripcion_prend' => 'required|string|max:35',
-            'precio'            => 'required|integer|min:10000',
-            'stock'             => 'required|integer|min:10',
-            'min_stock'         => 'required|integer|min:15',
-            'max_stock'         => 'required|integer|min:20',
+            'precio'            => 'required|integer|min:0',
+            'stock'             => 'required|integer|min:0',
+            'min_stock'         => 'required|integer|min:0',
+            'max_stock'         => 'required|integer|min:0',
             'fk_id_genero'      => 'required|integer',
             'fk_idt_prendas'    => 'required|integer',
             'fk_id_color'       => 'required|integer',
         ]);
 
         $imagen = null;
-        if ($request->hasFile('imagen_prend')) {
-            $imagen = file_get_contents($request->file('imagen_prend')->getRealPath());
-        }
+if ($request->hasFile('imagen_prend')) {
+    $file = $request->file('imagen_prend');
+    $nombreImagen = 'prenda_' . time() . '.' . $file->getClientOriginalExtension();
+    $carpeta = public_path('uploads/prendas/');
+    
+    if (!file_exists($carpeta)) {
+        mkdir($carpeta, 0755, true);
+    }
+    
+    $file->move($carpeta, $nombreImagen);
+    $imagen = $nombreImagen; // ← guarda solo el nombre, no el binario
+}
 
         Prenda::create(array_merge($validated, [
             'estado'         => 1,
@@ -99,10 +103,10 @@ class ProductoController extends Controller
             'codigo_barras'     => 'required|string|max:50|unique:prenda,codigo_barras,' . $codigo_barras . ',codigo_barras',
             'nombre_prend'      => 'required|string|max:25',
             'descripcion_prend' => 'required|string|max:35',
-            'precio'            => 'required|integer|min:10000',
-            'stock'             => 'required|integer|min:10',
-            'min_stock'         => 'required|integer|min:15',
-            'max_stock'         => 'required|integer|min:20',
+            'precio'            => 'required|integer|min:0',
+            'stock'             => 'required|integer|min:0',
+            'min_stock'         => 'required|integer|min:0',
+            'max_stock'         => 'required|integer|min:0',
             'fk_id_genero'      => 'required|integer',
             'fk_idt_prendas'    => 'required|integer',
             'fk_id_color'       => 'required|integer',
@@ -300,6 +304,95 @@ public function storeApartado(Request $request)
     } catch (\Exception $e) {
         DB::rollBack();
         return redirect()->back()->with('error', 'Error al procesar el apartado: ' . $e->getMessage());
+    }
+}
+public function registrarPrendaDesdeAndroid(Request $request)
+{
+    $validator = Validator::make($request->all(), [
+        'codigo_barras'     => 'required|string|max:50',
+        'nombre_prend'      => 'required|string|max:25',
+        'descripcion_prend' => 'required|string|max:35',
+        'precio'            => 'required|numeric',
+        'stock'             => 'required|numeric',
+        'min_stock'         => 'required|numeric',
+        'max_stock'         => 'required|numeric',
+        'fk_id_genero'      => 'required|numeric',
+        'fk_idt_prendas'    => 'required|numeric',
+        'fk_id_color'       => 'required|numeric',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Error de validación',
+            'errors'  => $validator->errors()
+        ], 400);
+    }
+
+    try {
+        // Procesar imagen si viene
+        $nombreImagen = null;
+        if ($request->has('imagen_prend') && !empty($request->input('imagen_prend'))) {
+         $imageData = base64_decode(str_replace(' ', '+', $request->input('imagen_prend')));
+            $nombreImagen = 'prenda_' . time() . '.jpg';
+            $carpeta = public_path('uploads/prendas/');
+            if (!file_exists($carpeta)) {
+                mkdir($carpeta, 0755, true);
+            }
+            file_put_contents($carpeta . $nombreImagen, $imageData);
+        }
+
+        // UN solo insert con todo incluida la imagen
+        DB::table('prenda')->insert([
+            'codigo_barras'     => trim($request->input('codigo_barras')),
+            'nombre_prend'      => trim($request->input('nombre_prend')),
+            'descripcion_prend' => trim($request->input('descripcion_prend')),
+            'precio'            => (int) $request->input('precio'),
+            'stock'             => (int) $request->input('stock'),
+            'min_stock'         => (int) $request->input('min_stock'),
+            'max_stock'         => (int) $request->input('max_stock'),
+            'fk_id_genero'      => (int) $request->input('fk_id_genero'),
+            'fk_idt_prendas'    => (int) $request->input('fk_idt_prendas'),
+            'fk_id_color'       => (int) $request->input('fk_id_color'),
+            'estado'            => 1,
+            'fecha_registro'    => now(),
+            'imagen_prend'      => $nombreImagen
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => '¡Prenda registrada con éxito!'
+        ], 201);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => $e->getMessage()
+        ], 500);
+    }
+}
+    public function obtenerParametrosPrenda()
+{
+    try {
+    
+        
+        $generos = DB::table('genero_prend')->select('id_genero_prend as id', 'tipo_genero as nombre')->get();
+        $tallas  = DB::table('t_prendas')->select('idt_prendas as id', 'talla_prend as nombre')->get();
+        $colores = DB::table('color')->select('id_color as id', 'nom_color as nombre')->get();
+
+        return response()->json([
+            'success' => true,
+            'generos' => $generos,
+            'tallas'  => $tallas,
+            'colores' => $colores
+        ], 200);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Error al consultar parámetros',
+            'error'   => $e->getMessage()
+        ], 500);
     }
 }
 }

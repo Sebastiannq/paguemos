@@ -97,9 +97,9 @@
                                 <div class="card-prenda-emp rounded-3xl bg-white border {{ $p->stock <= $p->min_stock ? 'border-amber-300 bg-amber-50/20' : 'border-pink-100' }} p-6 shadow-sm transition"
                                     data-genero="{{ $p->fk_id_genero }}">
                                     <div class="flex items-start gap-4">
-                                        @if ($p->imagen_prend)
-                                            <img src="data:image/jpeg;base64,{{ base64_encode($p->imagen_prend) }}"
-                                                alt="{{ $p->nombre_prend }}"
+                                       @if($p->imagen_prend)
+    <img src="{{ asset('uploads/prendas/' . $p->imagen_prend) }}"
+         alt="{{ $p->nombre_prend }}"
                                                 class="h-20 w-20 rounded-3xl object-cover shrink-0" />
                                         @else
                                             <div

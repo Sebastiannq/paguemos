@@ -371,9 +371,9 @@
                         @foreach($prendas as $p)
                         <div class="rounded-3xl bg-white border border-pink-100 p-6 shadow-sm hover:shadow-md transition">
                             <div class="flex items-start gap-4">
-                                @if($p->imagen_prend)
-                                    <img src="data:image/jpeg;base64,{{ base64_encode($p->imagen_prend) }}"
-                                         alt="{{ $p->nombre_prend }}"
+                              @if($p->imagen_prend)
+    <img src="{{ asset('uploads/prendas/' . $p->imagen_prend) }}"
+         alt="{{ $p->nombre_prend }}"
                                          class="h-20 w-20 rounded-3xl object-cover shrink-0" />
                                 @else
                                     <div class="h-20 w-20 rounded-3xl bg-pink-100 flex items-center justify-center text-pink-500 text-3xl font-bold shrink-0">

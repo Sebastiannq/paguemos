@@ -14,6 +14,7 @@ class UserController extends Controller
         if(session('rol') != 'admin' && session('rol') != 'administrador'){
             return redirect('/');
         }
+    
 
         // Trae todos los registros de la tabla 'usuario'
         $usuarios = User::all();
