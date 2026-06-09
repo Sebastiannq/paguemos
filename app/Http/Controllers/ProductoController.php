@@ -306,6 +306,7 @@ public function storeApartado(Request $request)
         return redirect()->back()->with('error', 'Error al procesar el apartado: ' . $e->getMessage());
     }
 }
+<<<<<<< Updated upstream
 public function registrarPrendaDesdeAndroid(Request $request)
 {
     $validator = Validator::make($request->all(), [
@@ -396,3 +397,89 @@ public function registrarPrendaDesdeAndroid(Request $request)
     }
 }
 }
+=======
+/**
+     * Endpoint exclusivo para registrar prendas desde la App Móvil Android (Volley)
+     */
+    public function registrarPrendaDesdeAndroid(Request $request)
+    {
+        // 1. Validamos los datos de forma segura. Quité el 'required' estricto de números
+        // para que si viaja vacío o mal, el validador nos avise en el celular en vez de estallar.
+        $validator = Validator::make($request->all(), [
+            'codigo_barras'     => 'required|string|max:50',
+            'nombre_prend'      => 'required|string|max:25',
+            'descripcion_prend' => 'required|string|max:35',
+            'precio'            => 'required|numeric',
+            'stock'             => 'required|numeric',
+            'min_stock'         => 'required|numeric',
+            'max_stock'         => 'required|numeric',
+            'fk_id_genero'      => 'required|numeric',
+            'fk_idt_prendas'    => 'required|numeric',
+            'fk_id_color'       => 'required|numeric',
+        ]);
+
+        // 🔥 SI LA VALIDACIÓN FALLA: Ahora sí te va a decir en el celular qué campo faltó
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error de validación en los datos',
+                'errors'  => $validator->errors()
+            ], 400);
+        }
+
+        try {
+            // 2. Insertamos directo usando Query Builder en la tabla 'prenda'
+            DB::table('prenda')->insert([
+                'codigo_barras'     => trim($request->input('codigo_barras')),
+                'nombre_prend'      => trim($request->input('nombre_prend')),
+                'descripcion_prend' => trim($request->input('descripcion_prend')),
+                'precio'            => (int) $request->input('precio'),
+                'stock'             => (int) $request->input('stock'),
+                'min_stock'         => (int) $request->input('min_stock'),
+                'max_stock'         => (int) $request->input('max_stock'),
+                'fk_id_genero'      => (int) $request->input('fk_id_genero'),
+                'fk_idt_prendas'    => (int) $request->input('fk_idt_prendas'),
+                'fk_id_color'       => (int) $request->input('fk_id_color'),
+                'estado'            => 1,
+                'fecha_registro'    => now(),
+                'imagen_prend'      => null
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => '¡Prenda registrada con éxito en Paguemenos!'
+            ], 201);
+
+        } catch (\Exception $e) {
+            // 🔥 SI FALLA LA BASE DE DATOS (Ej: Llave foránea que no existe en MySQL)
+            return response()->json([
+                'success' => false,
+                'message' => 'Error en la base de datos al insertar',
+                'error_sql' => $e->getMessage()
+            ], 500);
+        }
+    }
+    public function obtenerParametrosPrenda()
+    {
+        try {
+            $generos = DB::table('genero')->select('id_genero as id', 'nombre_genero as nombre')->get();
+            $tallas  = DB::table('tallas_prendas')->select('idt_prendas as id', 'talla_prendas as nombre')->get();
+            $colores = DB::table('color')->select('id_color as id', 'color_prendas as nombre')->get();
+
+            return response()->json([
+                'success' => true,
+                'generos' => $generos,
+                'tallas'  => $tallas,
+                'colores' => $colores
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al consultar parámetros',
+                'error'   => $e->getMessage()
+            ], 500);
+        }
+    }
+}
+>>>>>>> Stashed changes
