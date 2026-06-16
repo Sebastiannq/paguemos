@@ -97,16 +97,14 @@
                                 <div class="card-prenda-emp rounded-3xl bg-white border {{ $p->stock <= $p->min_stock ? 'border-amber-300 bg-amber-50/20' : 'border-pink-100' }} p-6 shadow-sm transition"
                                     data-genero="{{ $p->fk_id_genero }}">
                                     <div class="flex items-start gap-4">
-                                       @if($p->imagen_prend)
-    <img src="{{ asset('uploads/prendas/' . $p->imagen_prend) }}"
-         alt="{{ $p->nombre_prend }}"
-                                                class="h-20 w-20 rounded-3xl object-cover shrink-0" />
-                                        @else
-                                            <div
-                                                class="h-20 w-20 rounded-3xl bg-pink-100 flex items-center justify-center text-pink-500 text-3xl font-bold shrink-0">
-                                                {{ strtoupper(substr($p->nombre_prend, 0, 1)) }}
-                                            </div>
-                                        @endif
+                                        {{-- 🌟 CORRECCIÓN AQUÍ: Cambiado para usar el alias unificado imagen_url directo de internet o Base64 --}}
+                    @if($p->imagen_url)
+                        <img src="{{ $p->imagen_url }}" alt="{{ $p->nombre_prend }}" class="h-20 w-20 rounded-3xl object-cover shrink-0" />
+                    @else
+                        <div class="h-20 w-20 rounded-3xl bg-pink-100 flex items-center justify-center text-pink-500 text-3xl font-bold shrink-0">
+                            {{ strtoupper(substr($p->nombre_prend, 0, 1)) }}
+                        </div>
+                    @endif
                                         <div class="flex-1">
                                             <div class="flex items-center justify-between gap-4">
                                                 <div>

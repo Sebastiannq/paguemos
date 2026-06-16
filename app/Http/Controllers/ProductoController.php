@@ -9,24 +9,59 @@ use Illuminate\Support\Facades\Validator;
 
 class ProductoController extends Controller
 {
+    /**
+     * Helper privado para procesar la URL de la imagen de forma unificada
+     * Soporta: URLs web, Archivos físicos en 'uploads/prendas/' y datos Binarios/Base64
+     */
+    private function mapearImagenPrenda($item)
+    {
+        if ($item->imagen_prend) {
+            // Caso 1: Es una URL directa de internet
+            if (str_starts_with($item->imagen_prend, 'http')) {
+                $item->imagen_url = $item->imagen_prend;
+            } 
+            // Caso 2: Es un archivo físico subido desde el computador
+            elseif (file_exists(public_path('uploads/prendas/' . $item->imagen_prend))) {
+                $item->imagen_url = asset('uploads/prendas/' . $item->imagen_prend);
+            } 
+            // Caso 3: Es un binario crudo en la base de datos (Ej: de Android/Kotlin antiguo)
+            else {
+                $item->imagen_url = 'data:image/jpeg;base64,' . base64_encode($item->imagen_prend);
+            }
+        } else {
+            // Imagen de respaldo si no hay ningún archivo o string asignado
+            $item->imagen_url = asset('images/default.png');
+        }
+        return $item;
+    }
+
     public function index()
     {
         $prendas = DB::table('prenda')
             ->join('genero_prend', 'prenda.fk_id_genero', '=', 'genero_prend.id_genero_prend')
             ->join('t_prendas', 'prenda.fk_idt_prendas', '=', 't_prendas.idt_prendas')
             ->join('Color', 'prenda.fk_id_color', '=', 'Color.id_color')
-            ->select('prenda.*', 'genero_prend.tipo_genero', 't_prendas.talla_prend', 'Color.nom_color')
-            ->get();
+            ->select('prenda.*', 'genero_prend.tipo_genero', 't_prendas.talla_prend', 'Color.nom_color', 'prenda.imagen_prend as imagen_url')
+            ->get()
+            ->map(function ($item) {
+                return $this->mapearImagenPrenda($item);
+            });
 
-        // Agregamos las ventas para enviarlas al staff.blade.php
         $ventas = DB::table('venta')->orderBy('fecha_venta', 'desc')->get();
         
-        $usuarios = DB::table('users')->get();
-        $generos  = DB::table('genero_prend')->get();
-        $tallas   = DB::table('t_prendas')->get();
-        $colores  = DB::table('Color')->get();
+        $usuarios = DB::table('usuario')
+            ->leftJoin('usuario_rol', 'usuario.id_usuario', '=', 'usuario_rol.fkpk_id_usuario')
+            ->leftJoin('rol', 'usuario_rol.fkpk_id_rol', '=', 'rol.id_rol')
+            ->select('usuario.*', 'rol.nom_rol as role')
+            ->orderBy('usuario.id_usuario', 'asc')
+            ->get();
 
-        return view('dashboard.staff', compact('prendas', 'ventas', 'usuarios', 'generos', 'tallas', 'colores'));
+        $roles   = DB::table('rol')->orderBy('nom_rol')->get();
+        $generos = DB::table('genero_prend')->get();
+        $tallas  = DB::table('t_prendas')->get();
+        $colores = DB::table('Color')->get();
+
+        return view('dashboard.staff', compact('prendas', 'ventas', 'usuarios', 'roles', 'generos', 'tallas', 'colores'));
     }
 
     /**
@@ -38,21 +73,19 @@ class ProductoController extends Controller
             ->join('genero_prend', 'prenda.fk_id_genero', '=', 'genero_prend.id_genero_prend')
             ->join('t_prendas', 'prenda.fk_idt_prendas', '=', 't_prendas.idt_prendas')
             ->join('Color', 'prenda.fk_id_color', '=', 'Color.id_color')
-            ->select('prenda.*', 'genero_prend.tipo_genero', 't_prendas.talla_prend', 'Color.nom_color')
+            ->select('prenda.*', 'genero_prend.tipo_genero', 't_prendas.talla_prend', 'Color.nom_color', 'prenda.imagen_prend as imagen_url')
             ->where('prenda.estado', 1)
             ->orderBy('prenda.nombre_prend')
             ->get()
             ->map(function ($item) {
-                $item->imagen_url = $item->imagen_prend
-                    ? 'data:image/jpeg;base64,' . base64_encode($item->imagen_prend)
-                    : null;
-                return $item;
+                return $this->mapearImagenPrenda($item);
             });
 
         return view('client.home', compact('prendas'));
     }
+
     /**
-     * Guardar nueva Prenda
+     * Guardar nueva Prenda (Soporta PNG, JPG, JPEG)
      */
     public function store(Request $request)
     {
@@ -61,27 +94,28 @@ class ProductoController extends Controller
             'nombre_prend'      => 'required|string|max:25',
             'descripcion_prend' => 'required|string|max:35',
             'precio'            => 'required|integer|min:0',
-            'stock'             => 'required|integer|min:0',
+            'stock'             => 'required|integer|min:0|max:60',
             'min_stock'         => 'required|integer|min:0',
             'max_stock'         => 'required|integer|min:0',
             'fk_id_genero'      => 'required|integer',
             'fk_idt_prendas'    => 'required|integer',
             'fk_id_color'       => 'required|integer',
+            'imagen_prend'      => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         $imagen = null;
-if ($request->hasFile('imagen_prend')) {
-    $file = $request->file('imagen_prend');
-    $nombreImagen = 'prenda_' . time() . '.' . $file->getClientOriginalExtension();
-    $carpeta = public_path('uploads/prendas/');
-    
-    if (!file_exists($carpeta)) {
-        mkdir($carpeta, 0755, true);
-    }
-    
-    $file->move($carpeta, $nombreImagen);
-    $imagen = $nombreImagen; // ← guarda solo el nombre, no el binario
-}
+        if ($request->hasFile('imagen_prend')) {
+            $file = $request->file('imagen_prend');
+            $nombreImagen = 'prenda_' . time() . '.' . $file->getClientOriginalExtension();
+            $carpeta = public_path('uploads/prendas/');
+            
+            if (!file_exists($carpeta)) {
+                mkdir($carpeta, 0755, true);
+            }
+            
+            $file->move($carpeta, $nombreImagen);
+            $imagen = $nombreImagen;
+        }
 
         Prenda::create(array_merge($validated, [
             'estado'         => 1,
@@ -93,7 +127,7 @@ if ($request->hasFile('imagen_prend')) {
     }
 
     /**
-     * Actualizar Prenda
+     * Actualizar Prenda existente (Soporta PNG, JPG, JPEG)
      */
     public function update(Request $request, $codigo_barras)
     {
@@ -104,22 +138,34 @@ if ($request->hasFile('imagen_prend')) {
             'nombre_prend'      => 'required|string|max:25',
             'descripcion_prend' => 'required|string|max:35',
             'precio'            => 'required|integer|min:0',
-            'stock'             => 'required|integer|min:0',
+            'stock'             => 'required|integer|min:0|max:60',
             'min_stock'         => 'required|integer|min:0',
             'max_stock'         => 'required|integer|min:0',
             'fk_id_genero'      => 'required|integer',
             'fk_idt_prendas'    => 'required|integer',
             'fk_id_color'       => 'required|integer',
             'estado'            => 'required|integer',
+            'imagen_prend'      => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         if ($request->hasFile('imagen_prend')) {
-            $prenda->imagen_prend = file_get_contents($request->file('imagen_prend')->getRealPath());
+            $file = $request->file('imagen_prend');
+            $nombreImagen = 'prenda_' . time() . '.' . $file->getClientOriginalExtension();
+            $carpeta = public_path('uploads/prendas/');
+            
+            if (!file_exists($carpeta)) {
+                mkdir($carpeta, 0755, true);
+            }
+            
+            $file->move($carpeta, $nombreImagen);
+            
+            // Forzamos el nuevo nombre en el arreglo de datos válidos
+            $validated['imagen_prend'] = $nombreImagen;
         }
 
         $prenda->update($validated);
 
-        return redirect()->back()->with('success', 'Prenda actualizada correctamente.');
+        return redirect()->back()->with('success', 'Prenda actualizada con éxito.');
     }
 
     /**
@@ -133,17 +179,12 @@ if ($request->hasFile('imagen_prend')) {
     }
 
     /**
-     * Buscar prenda por código de barras — responde siempre en JSON.
-     * FIX: urldecode() para manejar caracteres especiales codificados en la URL.
+     * Buscar prenda por código de barras
      */
     public function buscarPorCodigo($codigo_barras)
     {
-        // urldecode por si el código viene con caracteres especiales codificados desde el fetch
         $codigo_limpio = trim(urldecode($codigo_barras));
 
-        // FIX: se excluye imagen_prend del SELECT porque es un BLOB binario
-        // que rompe json_encode() con "Malformed UTF-8 characters".
-        // La imagen no se necesita en el módulo de ventas.
         $prenda = DB::table('prenda')
             ->join('genero_prend', 'prenda.fk_id_genero', '=', 'genero_prend.id_genero_prend')
             ->join('t_prendas', 'prenda.fk_idt_prendas', '=', 't_prendas.idt_prendas')
@@ -193,232 +234,126 @@ if ($request->hasFile('imagen_prend')) {
     }
 
     public function buscarClientePorCorreo($correo)
-{
-    // Limpiamos el correo por si viene codificado de la URL
-    $correo_limpio = trim(urldecode($correo));
+    {
+        $correo_limpio = trim(urldecode($correo));
 
-    // Según tu diagrama relacional, la tabla es 'usuario' y los campos son primer_nom, primer_apelli, etc.
-    $cliente = DB::table('usuario')
-        ->select('id_usuario', 'primer_nom', 'primer_apelli', 'correo')
-        ->where('correo', $correo_limpio)
-        ->first();
+        $cliente = DB::table('usuario')
+            ->select('id_usuario', 'primer_nom', 'primer_apelli', 'correo')
+            ->where('correo', $correo_limpio)
+            ->first();
 
-    if (!$cliente) {
-        return response()->json([
-            'success' => false,
-            'message' => 'El correo electrónico no está registrado.'
-        ], 404);
-    }
-
-    return response()->json([
-        'success' => true,
-        'cliente' => $cliente
-    ], 200);
-}
-
-   public function indexEmpleado()
-{
-    $prendas = DB::table('prenda')
-        ->join('genero_prend', 'prenda.fk_id_genero', '=', 'genero_prend.id_genero_prend')
-        ->join('t_prendas', 'prenda.fk_idt_prendas', '=', 't_prendas.idt_prendas')
-        ->join('Color', 'prenda.fk_id_color', '=', 'Color.id_color')
-        ->select('prenda.*', 'genero_prend.tipo_genero', 't_prendas.talla_prend', 'Color.nom_color')
-        ->get();
-
-    $usuarios = DB::table('usuario')->get();
-    $generos  = DB::table('genero_prend')->get();
-
-    // 🔄 DOBLE JOIN CON ALIAS: Uno para el cliente y otro para el empleado
-    $apartados = DB::table('apartados')
-        ->join('prenda', 'apartados.fk_codigo_barras', '=', 'prenda.codigo_barras')
-        ->join('usuario as cliente', 'apartados.fk_id_usuario', '=', 'cliente.id_usuario') // Alias 'cliente'
-        ->join('usuario as empleado', 'apartados.fk_id_empleado', '=', 'empleado.id_usuario') // Alias 'empleado'
-        ->select(
-            'apartados.*', 
-            'prenda.nombre_prend', 
-            // Datos del Cliente
-            'cliente.primer_nom as cli_nom', 
-            'cliente.primer_apelli as cli_ape',
-            'cliente.correo as cli_correo',
-            // Datos del Empleado (ID y Nombre)
-            'empleado.id_usuario as emp_id',
-            'empleado.primer_nom as emp_nom',
-            'empleado.primer_apelli as emp_ape'
-        )
-        ->orderBy('apartados.fecha_apartado', 'desc')
-        ->get();
-
-    return view('empleado.home_empleado', compact('prendas', 'usuarios', 'generos', 'apartados'));
-}
-
-public function storeApartado(Request $request)
-{
-    // Validamos primero el cliente y los bloques del carrito
-    $validated = $request->validate([
-        'correo_cliente' => 'required|email|exists:usuario,correo',
-        'carrito_items'  => 'required|string', // Aquí viaja el JSON del carrito desde JS
-        'anticipo'       => 'required|integer|min:0',
-    ]);
-
-    // Decodificamos los productos que vienen del carrito de JavaScript
-    $items = json_decode($validated['carrito_items'], true);
-
-    if (empty($items)) {
-        return redirect()->back()->with('error', 'El carrito de apartados está vacío.');
-    }
-
-    // Buscamos al cliente una sola vez
-    $cliente = DB::table('usuario')->where('correo', $validated['correo_cliente'])->first();
-    
-    // Calculamos el total real sumando los precios del carrito para seguridad del backend
-    $total_apartado = 0;
-    foreach ($items as $item) {
-        $total_apartado += ($item['precio'] * $item['cantidad']);
-    }
-
-    // Iniciamos una Transacción por seguridad: o se guardan todos o ninguno
-    DB::beginTransaction();
-    try {
-        foreach ($items as $item) {
-            // Insertamos cada prenda del carrito como un registro en apartados
-            DB::table('apartados')->insert([
-    'fk_id_usuario'    => $cliente->id_usuario, 
-    'fk_id_empleado'   => session('user_id'),
-    'fk_codigo_barras' => $validated['fk_codigo_barras'],
-    'cantidad'         => $request->input('cantidad'), // <--- LO NUEVO
-    'fecha_apartado'   => now(),
-    'fecha_limite'     => $request->input('fecha_limite'),
-    'anticipo'         => $validated['anticipo'],
-    'total'            => $validated['total'],
-    'estado'           => 'pendiente',
-    'created_at'       => now()
-]);
-
-            // OPCIONAL: Aquí podrías restar el stock de la prenda si lo requieres
-            // DB::table('prenda')->where('codigo_barras', $item['codigo_barras'])->decrement('stock', $item['cantidad']);
+        if (!$cliente) {
+            return response()->json([
+                'success' => false,
+                'message' => 'El correo electrónico no está registrado.'
+            ], 404);
         }
 
-        DB::commit();
-        return redirect()->back()->with('success', '¡Apartado múltiple registrado con éxito!');
-
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return redirect()->back()->with('error', 'Error al procesar el apartado: ' . $e->getMessage());
-    }
-}
-<<<<<<< Updated upstream
-public function registrarPrendaDesdeAndroid(Request $request)
-{
-    $validator = Validator::make($request->all(), [
-        'codigo_barras'     => 'required|string|max:50',
-        'nombre_prend'      => 'required|string|max:25',
-        'descripcion_prend' => 'required|string|max:35',
-        'precio'            => 'required|numeric',
-        'stock'             => 'required|numeric',
-        'min_stock'         => 'required|numeric',
-        'max_stock'         => 'required|numeric',
-        'fk_id_genero'      => 'required|numeric',
-        'fk_idt_prendas'    => 'required|numeric',
-        'fk_id_color'       => 'required|numeric',
-    ]);
-
-    if ($validator->fails()) {
         return response()->json([
-            'success' => false,
-            'message' => 'Error de validación',
-            'errors'  => $validator->errors()
-        ], 400);
+            'success' => true,
+            'cliente' => $cliente
+        ], 200);
     }
 
-    try {
-        // Procesar imagen si viene
-        $nombreImagen = null;
-        if ($request->has('imagen_prend') && !empty($request->input('imagen_prend'))) {
-         $imageData = base64_decode(str_replace(' ', '+', $request->input('imagen_prend')));
-            $nombreImagen = 'prenda_' . time() . '.jpg';
-            $carpeta = public_path('uploads/prendas/');
-            if (!file_exists($carpeta)) {
-                mkdir($carpeta, 0755, true);
-            }
-            file_put_contents($carpeta . $nombreImagen, $imageData);
-        }
+    public function indexEmpleado()
+    {
+        $prendas = DB::table('prenda')
+            ->join('genero_prend', 'prenda.fk_id_genero', '=', 'genero_prend.id_genero_prend')
+            ->join('t_prendas', 'prenda.fk_idt_prendas', '=', 't_prendas.idt_prendas')
+            ->join('Color', 'prenda.fk_id_color', '=', 'Color.id_color')
+            ->select('prenda.*', 'genero_prend.tipo_genero', 't_prendas.talla_prend', 'Color.nom_color', 'prenda.imagen_prend as imagen_url')
+            ->get()
+            ->map(function ($item) {
+                return $this->mapearImagenPrenda($item);
+            });
 
-        // UN solo insert con todo incluida la imagen
-        DB::table('prenda')->insert([
-            'codigo_barras'     => trim($request->input('codigo_barras')),
-            'nombre_prend'      => trim($request->input('nombre_prend')),
-            'descripcion_prend' => trim($request->input('descripcion_prend')),
-            'precio'            => (int) $request->input('precio'),
-            'stock'             => (int) $request->input('stock'),
-            'min_stock'         => (int) $request->input('min_stock'),
-            'max_stock'         => (int) $request->input('max_stock'),
-            'fk_id_genero'      => (int) $request->input('fk_id_genero'),
-            'fk_idt_prendas'    => (int) $request->input('fk_idt_prendas'),
-            'fk_id_color'       => (int) $request->input('fk_id_color'),
-            'estado'            => 1,
-            'fecha_registro'    => now(),
-            'imagen_prend'      => $nombreImagen
+        $usuarios = DB::table('usuario')->get();
+        $generos  = DB::table('genero_prend')->get();
+
+        $apartados = DB::table('apartados')
+            ->join('prenda', 'apartados.fk_codigo_barras', '=', 'prenda.codigo_barras')
+            ->join('usuario as cliente', 'apartados.fk_id_usuario', '=', 'cliente.id_usuario')
+            ->join('usuario as empleado', 'apartados.fk_id_empleado', '=', 'empleado.id_usuario')
+            ->select(
+                'apartados.*', 
+                'prenda.nombre_prend', 
+                'cliente.primer_nom as cli_nom', 
+                'cliente.primer_apelli as cli_ape',
+                'cliente.correo as cli_correo',
+                'empleado.id_usuario as emp_id',
+                'empleado.primer_nom as emp_nom',
+                'empleado.primer_apelli as emp_ape'
+            )
+            ->orderBy('apartados.fecha_apartado', 'desc')
+            ->get();
+
+        return view('empleado.home_empleado', compact('prendas', 'usuarios', 'generos', 'apartados'));
+    }
+
+    public function storeApartado(Request $request)
+    {
+        $validated = $request->validate([
+            'correo_cliente' => 'required|email|exists:usuario,correo',
+            'carrito_items'  => 'required|string', 
+            'anticipo'       => 'required|integer|min:0',
         ]);
 
-        return response()->json([
-            'success' => true,
-            'message' => '¡Prenda registrada con éxito!'
-        ], 201);
+        $items = json_decode($validated['carrito_items'], true);
 
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'message' => $e->getMessage()
-        ], 500);
-    }
-}
-    public function obtenerParametrosPrenda()
-{
-    try {
-    
+        if (empty($items)) {
+            return redirect()->back()->with('error', 'El carrito de apartados está vacío.');
+        }
+
+        $cliente = DB::table('usuario')->where('correo', $validated['correo_cliente'])->first();
         
-        $generos = DB::table('genero_prend')->select('id_genero_prend as id', 'tipo_genero as nombre')->get();
-        $tallas  = DB::table('t_prendas')->select('idt_prendas as id', 'talla_prend as nombre')->get();
-        $colores = DB::table('color')->select('id_color as id', 'nom_color as nombre')->get();
+        $total_apartado = 0;
+        foreach ($items as $item) {
+            $total_apartado += ($item['precio'] * $item['cantidad']);
+        }
 
-        return response()->json([
-            'success' => true,
-            'generos' => $generos,
-            'tallas'  => $tallas,
-            'colores' => $colores
-        ], 200);
+        DB::beginTransaction();
+        try {
+            foreach ($items as $item) {
+                DB::table('apartados')->insert([
+                    'fk_id_usuario'    => $cliente->id_usuario, 
+                    'fk_id_empleado'   => session('user_id'),
+                    'fk_codigo_barras' => $item['codigo_barras'],
+                    'cantidad'         => $item['cantidad'],       
+                    'fecha_apartado'   => now(),
+                    'fecha_limite'     => $request->input('fecha_limite'),
+                    'anticipo'         => $validated['anticipo'],
+                    'total'            => $total_apartado,         
+                    'estado'           => 'pendiente',
+                    'created_at'       => now()
+                ]);
+            }
 
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Error al consultar parámetros',
-            'error'   => $e->getMessage()
-        ], 500);
+            DB::commit();
+            return redirect()->back()->with('success', '¡Apartado múltiple registrado con éxito!');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Error al procesar el apartado: ' . $e->getMessage());
+        }
     }
-}
-}
-=======
-/**
-     * Endpoint exclusivo para registrar prendas desde la App Móvil Android (Volley)
+
+    /** * Endpoint exclusivo para registrar prendas desde la App Móvil Android (Volley)
      */
     public function registrarPrendaDesdeAndroid(Request $request)
     {
-        // 1. Validamos los datos de forma segura. Quité el 'required' estricto de números
-        // para que si viaja vacío o mal, el validador nos avise en el celular en vez de estallar.
         $validator = Validator::make($request->all(), [
-            'codigo_barras'     => 'required|string|max:50',
-            'nombre_prend'      => 'required|string|max:25',
-            'descripcion_prend' => 'required|string|max:35',
-            'precio'            => 'required|numeric',
-            'stock'             => 'required|numeric',
-            'min_stock'         => 'required|numeric',
-            'max_stock'         => 'required|numeric',
-            'fk_id_genero'      => 'required|numeric',
-            'fk_idt_prendas'    => 'required|numeric',
-            'fk_id_color'       => 'required|numeric',
+            'codigo_barras'      => 'required|string|max:50',
+            'nombre_prend'       => 'required|string|max:25',
+            'descripcion_prend'  => 'required|string|max:35',
+            'precio'             => 'required|numeric',
+            'stock'              => 'required|numeric',
+            'min_stock'          => 'required|numeric',
+            'max_stock'          => 'required|numeric',
+            'fk_id_genero_prend' => 'required|numeric',
+            'fk_idt_prendas'     => 'required|numeric',
+            'fk_id_color'        => 'required|numeric',
         ]);
 
-        // 🔥 SI LA VALIDACIÓN FALLA: Ahora sí te va a decir en el celular qué campo faltó
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
@@ -428,21 +363,31 @@ public function registrarPrendaDesdeAndroid(Request $request)
         }
 
         try {
-            // 2. Insertamos directo usando Query Builder en la tabla 'prenda'
+            $nombreImagen = null;
+            if ($request->has('imagen_prend') && !empty($request->input('imagen_prend'))) {
+                $imageData = base64_decode(str_replace(' ', '+', $request->input('imagen_prend')));
+                $nombreImagen = 'prenda_' . time() . '.jpg';
+                $carpeta = public_path('uploads/prendas/');
+                if (!file_exists($carpeta)) {
+                    mkdir($carpeta, 0755, true);
+                }
+                file_put_contents($carpeta . $nombreImagen, $imageData);
+            }
+
             DB::table('prenda')->insert([
-                'codigo_barras'     => trim($request->input('codigo_barras')),
-                'nombre_prend'      => trim($request->input('nombre_prend')),
-                'descripcion_prend' => trim($request->input('descripcion_prend')),
-                'precio'            => (int) $request->input('precio'),
-                'stock'             => (int) $request->input('stock'),
-                'min_stock'         => (int) $request->input('min_stock'),
-                'max_stock'         => (int) $request->input('max_stock'),
-                'fk_id_genero'      => (int) $request->input('fk_id_genero'),
-                'fk_idt_prendas'    => (int) $request->input('fk_idt_prendas'),
-                'fk_id_color'       => (int) $request->input('fk_id_color'),
-                'estado'            => 1,
-                'fecha_registro'    => now(),
-                'imagen_prend'      => null
+                'codigo_barras'      => trim($request->input('codigo_barras')),
+                'nombre_prend'       => trim($request->input('nombre_prend')),
+                'descripcion_prend'  => trim($request->input('descripcion_prend')),
+                'precio'             => (int) $request->input('precio'),
+                'stock'              => (int) $request->input('stock'),
+                'min_stock'          => (int) $request->input('min_stock'),
+                'max_stock'          => (int) $request->input('max_stock'),
+                'fk_id_genero_prend' => (int) $request->input('fk_id_genero_prend'), 
+                'fk_idt_prendas'     => (int) $request->input('fk_idt_prendas'),
+                'fk_id_color'        => (int) $request->input('fk_id_color'),
+                'estado'             => 1,
+                'fecha_registro'     => now(),
+                'imagen_prend'       => $nombreImagen
             ]);
 
             return response()->json([
@@ -451,7 +396,6 @@ public function registrarPrendaDesdeAndroid(Request $request)
             ], 201);
 
         } catch (\Exception $e) {
-            // 🔥 SI FALLA LA BASE DE DATOS (Ej: Llave foránea que no existe en MySQL)
             return response()->json([
                 'success' => false,
                 'message' => 'Error en la base de datos al insertar',
@@ -459,12 +403,16 @@ public function registrarPrendaDesdeAndroid(Request $request)
             ], 500);
         }
     }
+
+    /**
+     * Obtener parámetros de prendas (GÉNEROS, TALLAS Y COLORES REALES)
+     */
     public function obtenerParametrosPrenda()
     {
         try {
-            $generos = DB::table('genero')->select('id_genero as id', 'nombre_genero as nombre')->get();
-            $tallas  = DB::table('tallas_prendas')->select('idt_prendas as id', 'talla_prendas as nombre')->get();
-            $colores = DB::table('color')->select('id_color as id', 'color_prendas as nombre')->get();
+            $generos = DB::table('genero_prend')->select('id_genero_prend as id', 'tipo_genero as nombre')->get();
+            $tallas  = DB::table('t_prendas')->select('idt_prendas as id', 'talla_prend as nombre')->get();
+            $colores = DB::table('Color')->select('id_color as id', 'nom_color as nombre')->get();
 
             return response()->json([
                 'success' => true,
@@ -482,4 +430,3 @@ public function registrarPrendaDesdeAndroid(Request $request)
         }
     }
 }
->>>>>>> Stashed changes

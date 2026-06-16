@@ -102,54 +102,59 @@
         </div>
 
         <!-- Productos Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            @forelse($prendas as $prenda)
-                <div class="bg-white rounded-lg shadow overflow-hidden hover:shadow-lg transition">
-                    <div class="h-56 bg-gray-100 overflow-hidden flex items-center justify-center">
-                        @if($prenda->imagen_url)
-                            <img src="{{ $prenda->imagen_url }}" alt="{{ $prenda->nombre_prend }}" class="w-full h-full object-cover">
-                        @else
-                            <div class="text-6xl">👕</div>
-                        @endif
-                    </div>
-                    <div class="p-4">
-                        <h3 class="font-bold text-gray-900 mb-2">{{ $prenda->nombre_prend }}</h3>
-                        <p class="text-gray-600 text-sm mb-2">{{ $prenda->descripcion_prend }}</p>
-                        <div class="space-y-1 mb-4 text-sm text-gray-600">
-                            <p class="font-semibold text-base">Género: {{ $prenda->tipo_genero ?? 'N/A' }}</p>
-                            <p class="font-semibold text-base">Talla: {{ $prenda->talla_prend ?? 'N/A' }}</p>
-                            <p class="font-semibold text-base">Color: {{ $prenda->nom_color ?? 'N/A' }}</p>
-                        </div>
-                        @php
-                            $productoJson = json_encode([
-                                'codigo_barras' => $prenda->codigo_barras,
-                                'nombre_prend' => $prenda->nombre_prend,
-                                'descripcion_prend' => $prenda->descripcion_prend,
-                                'precio' => $prenda->precio,
-                                'imagen' => $prenda->imagen_url,
-                                'talla_prend' => $prenda->talla_prend,
-                                'nom_color' => $prenda->nom_color,
-                                'stock' => $prenda->stock ?? 0,
-                            ], JSON_HEX_APOS | JSON_HEX_QUOT);
-                        @endphp
-                        <div class="flex items-center justify-between gap-3">
-                            <span class="text-2xl font-bold text-pink-600">${{ number_format($prenda->precio, 2, ',', '.') }}</span>
-                            <span class="text-sm text-slate-500">Stock: {{ $prenda->stock ?? 0 }}</span>
-                        </div>
-                        <div class="mt-3 flex items-center gap-2">
-                            <input type="number" min="1" max="{{ $prenda->stock ?? 1 }}" value="1" {{ ($prenda->stock ?? 0) <= 0 ? 'disabled' : '' }} class="w-20 rounded-2xl border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:border-pink-400 focus:ring-2 focus:ring-pink-100 outline-none {{ ($prenda->stock ?? 0) <= 0 ? 'bg-slate-100 cursor-not-allowed' : '' }}" />
-                            <button type="button" data-product="{{ $productoJson }}" class="add-to-cart-button px-4 py-2 {{ ($prenda->stock ?? 0) <= 0 ? 'bg-slate-400 cursor-not-allowed' : 'bg-pink-600 hover:bg-pink-700' }} text-white rounded transition" {{ ($prenda->stock ?? 0) <= 0 ? 'disabled' : '' }}>
-                                {{ ($prenda->stock ?? 0) <= 0 ? 'Sin stock' : 'Agregar' }}
-                            </button>
-                        </div>
-                    </div>
+       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    @forelse($prendas as $prenda)
+        <div class="bg-white rounded-lg shadow overflow-hidden hover:shadow-lg transition">
+            <div class="h-56 bg-gray-100 overflow-hidden flex items-center justify-center">
+                
+                {{-- 🌟 CORRECCIÓN AQUÍ: Usamos de manera consistente la variable imagen_url --}}
+                @if($prenda->imagen_url)
+                    <img src="{{ $prenda->imagen_url }}" alt="{{ $prenda->nombre_prend }}" style="width: 100%; height: 200px; object-fit: cover;">  
+                @else
+                    <div class="text-6xl">👕</div>
+                @endif
+                
+            </div>
+            <div class="p-4">
+                <h3 class="font-bold text-gray-900 mb-2">{{ $prenda->nombre_prend }}</h3>
+                <p class="text-gray-600 text-sm mb-2">{{ $prenda->descripcion_prend }}</p>
+                <div class="space-y-1 mb-4 text-sm text-gray-600">
+                    <p class="font-semibold text-base">Género: {{ $prenda->tipo_genero ?? 'N/A' }}</p>
+                    <p class="font-semibold text-base">Talla: {{ $prenda->talla_prend ?? 'N/A' }}</p>
+                    <p class="font-semibold text-base">Color: {{ $prenda->nom_color ?? 'N/A' }}</p>
                 </div>
-            @empty
-                <div class="col-span-full p-10 bg-white rounded-lg shadow text-center text-gray-500">
-                    No hay prendas registradas en el catálogo.
+                
+                @php
+                    $productoJson = json_encode([
+                        'codigo_barras' => $prenda->codigo_barras,
+                        'nombre_prend' => $prenda->nombre_prend,
+                        'descripcion_prend' => $prenda->descripcion_prend,
+                        'precio' => $prenda->precio,
+                        'imagen' => $prenda->imagen_url, // 🌟 Se pasa también corregido al JSON del carrito
+                        'talla_prend' => $prenda->talla_prend,
+                        'nom_color' => $prenda->nom_color,
+                        'stock' => $prenda->stock ?? 0,
+                    ], JSON_HEX_APOS | JSON_HEX_QUOT);
+                @endphp
+                
+                <div class="flex items-center justify-between gap-3">
+                    <span class="text-2xl font-bold text-pink-600">${{ number_format($prenda->precio, 0, ',', '.') }}</span>
+                    <span class="text-sm text-slate-500">Stock: {{ $prenda->stock ?? 0 }}</span>
                 </div>
-            @endforelse
+                <div class="mt-3 flex items-center gap-2">
+                    <input type="number" min="1" max="{{ $prenda->stock ?? 1 }}" value="1" {{ ($prenda->stock ?? 0) <= 0 ? 'disabled' : '' }} class="quantity-input w-20 rounded-2xl border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:border-pink-400 focus:ring-2 focus:ring-pink-100 outline-none {{ ($prenda->stock ?? 0) <= 0 ? 'bg-slate-100 cursor-not-allowed' : '' }}" />
+                    <button type="button" data-product="{{ $productoJson }}" class="add-to-cart-button px-4 py-2 {{ ($prenda->stock ?? 0) <= 0 ? 'bg-slate-400 cursor-not-allowed' : 'bg-pink-600 hover:bg-pink-700' }} text-white rounded transition" {{ ($prenda->stock ?? 0) <= 0 ? 'disabled' : '' }}>
+                        {{ ($prenda->stock ?? 0) <= 0 ? 'Sin stock' : 'Agregar' }}
+                    </button>
+                </div>
+            </div>
         </div>
+    @empty
+        <div class="col-span-full p-10 bg-white rounded-lg shadow text-center text-gray-500">
+            No hay prendas registradas en el catálogo.
+        </div>
+    @endforelse
+</div>
 
         <!-- Más Productos -->
         <div class="mt-12 text-center">
@@ -238,7 +243,10 @@
                     </div>
                     <div class="mt-4 flex items-center justify-between gap-3 text-sm text-slate-700">
                         <span>${formatMoney(item.precio * cantidad)}</span>
-                        <button type="button" onclick="removeFromCart(${index})" class="rounded-2xl bg-red-600 px-3 py-2 text-white hover:bg-red-700 transition">Quitar 1</button>
+                        <div class="flex gap-2">
+                            <button type="button" onclick="addMoreToCart(${index})" class="rounded-2xl bg-pink-600 px-3 py-2 text-white hover:bg-pink-700 transition">Agregar 1</button>
+                            <button type="button" onclick="removeFromCart(${index})" class="rounded-2xl bg-red-600 px-3 py-2 text-white hover:bg-red-700 transition">Quitar 1</button>
+                        </div>
                     </div>
                 `;
                 cartItemsContainer.appendChild(itemCard);
@@ -250,6 +258,13 @@
 
         function addToCart(item, cantidad = 1) {
             hideStockMessage();
+            
+            cantidad = Number(cantidad) || 0;
+            if (cantidad <= 0) {
+                showStockMessage('Por favor ingresa una cantidad válida (mínimo 1 unidad).');
+                return;
+            }
+
             const stock = Number(item.stock || 0);
             if (stock <= 0) {
                 showStockMessage('No hay stock disponible para este producto.');
@@ -294,6 +309,19 @@
             renderCart();
         }
 
+        function addMoreToCart(index) {
+            if (!cart[index]) return;
+            const item = cart[index];
+            const maxStock = item.stock || 1;
+            if (item.cantidad < maxStock) {
+                item.cantidad += 1;
+                saveCart();
+                renderCart();
+            } else {
+                showStockMessage(`No hay más unidades disponibles. Stock máximo: ${maxStock}`);
+            }
+        }
+
         function clearCart() {
             cart = [];
             saveCart();
@@ -306,10 +334,33 @@
                     try {
                         const item = JSON.parse(button.dataset.product);
                         const quantityInput = button.previousElementSibling;
-                        const cantidad = Number(quantityInput?.value) || 1;
+                        let cantidad = Number(quantityInput?.value) || 1;
+                        
+                        if (cantidad < 1) {
+                            cantidad = 1;
+                            quantityInput.value = 1;
+                        }
+                        
                         addToCart(item, cantidad);
                     } catch (error) {
                         console.error('Error parsing producto:', error, button.dataset.product);
+                    }
+                });
+            });
+            
+            document.querySelectorAll('input.quantity-input').forEach(input => {
+                input.addEventListener('change', function() {
+                    if (this.value < 1 || this.value === '') {
+                        this.value = 1;
+                    }
+                    if (this.max && this.value > this.max) {
+                        this.value = this.max;
+                    }
+                });
+                
+                input.addEventListener('input', function() {
+                    if (this.value < 1 && this.value !== '') {
+                        this.value = 1;
                     }
                 });
             });

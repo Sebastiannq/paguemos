@@ -50,14 +50,14 @@
                         <i class="fa-solid fa-box-open w-6 text-pink-400"></i>
                         Catálogo / Inventario
                     </a>
-                    <a href="#facturas" data-section="facturas" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-2xl transition {{ $activeSection == 'facturas' ? 'active-link bg-pink-500/10 border border-pink-100 text-pink-600 shadow-sm' : 'text-slate-600 hover:bg-pink-100 hover:text-pink-600' }}">
+                    <!-- <a href="#facturas" data-section="facturas" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-2xl transition {{ $activeSection == 'facturas' ? 'active-link bg-pink-500/10 border border-pink-100 text-pink-600 shadow-sm' : 'text-slate-600 hover:bg-pink-100 hover:text-pink-600' }}">
                         <i class="fa-solid fa-file-invoice-dollar w-6 text-pink-400"></i>
                         Facturas
                     </a>
                     <a href="#movimientos" data-section="movimientos" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-2xl transition {{ $activeSection == 'movimientos' ? 'active-link bg-pink-500/10 border border-pink-100 text-pink-600 shadow-sm' : 'text-slate-600 hover:bg-pink-100 hover:text-pink-600' }}">
                         <i class="fa-solid fa-arrow-right-arrow-left w-6 text-pink-400"></i>
                         Movimientos
-                    </a>
+                    </a> -->
                     <a href="#usuarios" data-section="usuarios" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-2xl transition {{ $activeSection == 'usuarios' ? 'active-link bg-pink-500/10 border border-pink-100 text-pink-600 shadow-sm' : 'text-slate-600 hover:bg-pink-100 hover:text-pink-600' }}">
                         <i class="fa-solid fa-users w-6 text-pink-400"></i>
                         Usuarios
@@ -156,19 +156,7 @@
                     </div>
                 </div>
 
-                {{-- Buscador global --}}
-                <div class="rounded-3xl bg-white border border-pink-100 p-5 shadow-sm shadow-pink-200/40 mb-8">
-                    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                        <div>
-                            <p class="text-sm font-medium text-slate-500">Buscador Inteligente</p>
-                            <p class="text-xs text-slate-400">Escanea un código de barras o escribe para filtrar al instante.</p>
-                        </div>
-                        <div class="relative w-full lg:w-1/2">
-                            <i class="fa-solid fa-barcode absolute left-4 top-1/2 -translate-y-1/2 text-pink-400 text-lg"></i>
-                            <input type="text" placeholder="Escribe o escanea el código de barras único..." class="w-full rounded-3xl border border-pink-100 bg-white py-3 pl-12 pr-4 text-slate-700 outline-none focus:border-pink-300 focus:ring-2 focus:ring-pink-100" />
-                        </div>
-                    </div>
-                </div>
+                
 
                 {{-- ===== SECCIÓN: RESUMEN ===== --}}
                 <section id="resumen" class="mb-8 {{ $activeSection !== 'resumen' ? 'hidden' : '' }}">
@@ -209,9 +197,8 @@
 
                             <form action="{{ route('venta.store') }}" method="POST" id="formTransaccion" class="space-y-6">
                                 @csrf
-                                {{-- Campo oculto para pasar el código escaneado al backend --}}
-                                <input type="hidden" name="codigo_barras" id="hidden_codigo_barras">
-                                <input type="hidden" name="precio_unitario" id="hidden_precio_unitario">
+                                <input type="hidden" name="carrito_items" id="carrito_items_hidden" value="[]">
+
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div class="space-y-1">
                                         <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Tipo de Transacción</label>
@@ -235,7 +222,7 @@
                                         <span class="flex items-center gap-2"><i class="fa-solid fa-barcode text-sm"></i> Escanear Código de Barras Único</span>
                                         <span id="searchStatusVentas" class="text-[10px] font-bold text-pink-500 bg-white border border-pink-200 px-2 py-0.5 rounded-md hidden">Buscando...</span>
                                     </label>
-                                    <input type="text" id="codigo_barras_venta" name="codigo_barras" required autocomplete="off"
+                                    <input type="text" id="codigo_barras_venta" autocomplete="off"
                                         placeholder="Pasa el lector láser o digita el código de barras..."
                                         class="w-full rounded-xl border border-pink-200 bg-white px-4 py-3.5 text-base text-slate-800 font-mono font-bold focus:border-pink-400 focus:ring-4 focus:ring-pink-50 outline-none transition" />
                                 </div>
@@ -256,7 +243,7 @@
                                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                     <div class="space-y-1">
                                         <label class="block text-xs font-semibold text-slate-400">Precio Base ($)</label>
-                                        <input type="number" id="precio_unitario_venta" name="precio_unitario" readonly placeholder="0"
+                                        <input type="number" id="precio_unitario_venta" readonly placeholder="0"
                                             class="w-full rounded-xl border border-slate-100 bg-slate-50 px-4 py-2.5 text-sm font-mono font-bold text-slate-800 outline-none" />
                                     </div>
                                     <div class="space-y-1">
@@ -266,9 +253,37 @@
                                     </div>
                                     <div class="space-y-1">
                                         <label class="block text-xs font-semibold text-slate-600 flex items-center gap-1"><i class="fa-solid fa-arrow-up-9-0 text-pink-500"></i> Cantidad</label>
-                                        <input type="number" id="cantidad_vendida_venta" name="cantidad_vendida" required min="1" disabled value="1"
+                                        <input type="number" id="cantidad_vendida_venta" min="1" disabled value="1"
                                             class="w-full rounded-xl border border-pink-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-800 outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-50 transition" />
                                     </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                                    <div></div>
+                                    <div class="flex justify-end">
+                                        <button type="button" id="btnAgregarAlCarrito" disabled class="w-full sm:w-auto bg-slate-200 text-slate-400 font-bold text-sm px-8 py-3.5 rounded-2xl transition flex items-center justify-center gap-2 cursor-not-allowed">
+                                            <i class="fa-solid fa-cart-plus"></i> Agregar al carrito
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="border border-pink-100 rounded-3xl overflow-hidden">
+                                    <table class="w-full text-left border-collapse">
+                                        <thead class="bg-pink-50 text-slate-500 text-xs uppercase tracking-wider">
+                                            <tr>
+                                                <th class="p-4 font-semibold">Prenda</th>
+                                                <th class="p-4 font-semibold text-center">Cant.</th>
+                                                <th class="p-4 font-semibold text-right">Precio</th>
+                                                <th class="p-4 font-semibold text-right">Subtotal</th>
+                                                <th class="p-4 font-semibold text-center">Acción</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="ventaCarritoBody" class="text-sm divide-y divide-pink-50">
+                                            <tr id="ventaCarritoVacio">
+                                                <td colspan="5" class="p-8 text-center text-slate-400 font-medium">No hay prendas agregadas al carrito.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
                                 </div>
 
                                 <div class="pt-4 border-t border-pink-50 flex justify-end">
@@ -356,77 +371,93 @@
 
                 </section>
 
-                {{-- ===== SECCIÓN: INVENTARIO ===== --}}
-                <section id="inventario" class="mb-8 {{ $activeSection !== 'inventario' ? 'hidden' : '' }}">
-                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-                        <div>
-                            <h2 class="text-2xl font-bold text-slate-900">Catálogo / Inventario</h2>
-                        </div>
-                        {{-- CORRECCIÓN: el id del modal debe existir en el DOM --}}
-                        <button onclick="toggleModal('createModal')" class="inline-flex items-center gap-2 rounded-3xl bg-pink-500 px-5 py-3 text-sm font-semibold text-white hover:bg-pink-600 transition">
-                            <i class="fa-solid fa-plus"></i> Agregar Prenda
-                        </button>
-                    </div>
-                    <div class="grid gap-5 lg:grid-cols-2">
-                        @foreach($prendas as $p)
-                        <div class="rounded-3xl bg-white border border-pink-100 p-6 shadow-sm hover:shadow-md transition">
-                            <div class="flex items-start gap-4">
-                              @if($p->imagen_prend)
-    <img src="{{ asset('uploads/prendas/' . $p->imagen_prend) }}"
-         alt="{{ $p->nombre_prend }}"
-                                         class="h-20 w-20 rounded-3xl object-cover shrink-0" />
-                                @else
-                                    <div class="h-20 w-20 rounded-3xl bg-pink-100 flex items-center justify-center text-pink-500 text-3xl font-bold shrink-0">
-                                        {{ strtoupper(substr($p->nombre_prend, 0, 1)) }}
-                                    </div>
-                                @endif
-                                <div class="flex-1">
-                                    <div class="flex items-center justify-between gap-4">
-                                        <div>
-                                            <h3 class="text-lg font-semibold text-slate-900">{{ $p->nombre_prend }}</h3>
-                                            <p class="text-xs text-slate-400">Código: {{ $p->codigo_barras ?? 'No asignado' }}</p>
-                                        </div>
-                                        <span class="text-lg font-bold text-pink-500">${{ number_format($p->precio, 0, ',', '.') }}</span>
-                                    </div>
-                                    <div class="mt-4 grid grid-cols-2 gap-2">
-                                        <div class="rounded-2xl bg-pink-50/60 p-2 text-xs text-center text-slate-700">Stock: {{ $p->stock }}</div>
-                                        <div class="rounded-2xl bg-pink-50/60 p-2 text-xs text-center text-slate-700">Talla: {{ $p->talla_prend }}</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="mt-5 flex items-center justify-between">
-                                <span class="rounded-full px-3 py-1 text-xs font-semibold {{ $p->estado == 1 ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500' }}">
-                                    {{ $p->estado == 1 ? 'Activo' : 'Inactivo' }}
-                                </span>
-                                <div class="flex gap-2">
-                                    <button
-                                        onclick="abrirModalEditar(
-                                            '{{ $p->codigo_barras }}',
-                                            '{{ addslashes($p->nombre_prend) }}',
-                                            '{{ addslashes($p->descripcion_prend) }}',
-                                            {{ $p->precio }},
-                                            {{ $p->stock }},
-                                            {{ $p->min_stock }},
-                                            {{ $p->max_stock }},
-                                            {{ $p->fk_id_genero }},
-                                            {{ $p->fk_idt_prendas }},
-                                            {{ $p->fk_id_color }},
-                                            {{ $p->estado }}
-                                        )"
-                                        class="rounded-2xl bg-pink-100 px-4 py-2 text-xs font-semibold text-pink-600 hover:bg-pink-200 transition">
-                                        Editar
-                                    </button>
-                                    <form action="{{ route('prenda.destroy', $p->codigo_barras) }}" method="POST" class="inline">
-                                        @csrf @method('DELETE')
-                                        <button type="submit" onclick="return confirm('¿Eliminar prenda?')" class="rounded-2xl bg-slate-100 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-200 transition">Eliminar</button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                        @endforeach
-                    </div>
-                </section>
+              {{-- ===== SECCIÓN: INVENTARIO ===== --}}
+<section id="inventario" class="mb-8 {{ $activeSection !== 'inventario' ? 'hidden' : '' }}">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+        <div>
+            <h2 class="text-2xl font-bold text-slate-900">Catálogo / Inventario</h2>
+        </div>
+        {{-- CORRECCIÓN: el id del modal debe existir en el DOM --}}
+        <button onclick="toggleModal('createModal')" class="inline-flex items-center gap-2 rounded-3xl bg-pink-500 px-5 py-3 text-sm font-semibold text-white hover:bg-pink-600 transition">
+            <i class="fa-solid fa-plus"></i> Agregar Prenda
+        </button>
+    </div>
+    <div class="grid gap-4 lg:grid-cols-[1fr_auto] items-end mb-6">
+        <div class="space-y-2">
+            <label for="inventoryBarcodeSearch" class="block text-xs font-bold uppercase tracking-wider text-slate-500">Buscar por código de barras</label>
+            <div class="relative">
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"><i class="fa-solid fa-magnifying-glass"></i></span>
+                <input id="inventoryBarcodeSearch" type="search" placeholder="Ej: 7701234567890" class="w-full rounded-2xl border border-pink-100 bg-white px-12 py-3 text-sm text-slate-800 outline-none focus:border-pink-300 focus:ring-2 focus:ring-pink-100 transition" />
+            </div>
+        </div>
+        <div class="space-y-2">
+            <label for="inventoryGeneroFilter" class="block text-xs font-bold uppercase tracking-wider text-slate-500">Filtrar por género</label>
+            <select id="inventoryGeneroFilter" class="w-full rounded-2xl border border-pink-100 bg-white px-4 py-3 text-sm text-slate-700 outline-none focus:border-pink-300 focus:ring-2 focus:ring-pink-100 transition">
+                <option value="">Todos los géneros</option>
+                @foreach($generos as $g)
+                    <option value="{{ $g->id_genero_prend }}">{{ $g->tipo_genero }}</option>
+                @endforeach
+            </select>
+        </div>
+    </div>
+    <p id="inventoryNoResults" class="mb-6 hidden rounded-2xl bg-rose-50 border border-rose-100 p-4 text-sm font-semibold text-rose-700">No se encontró ninguna prenda con esos criterios.</p>
+    <div class="grid gap-5 lg:grid-cols-2">
+        @foreach($prendas as $p)
+        <div class="product-card rounded-3xl bg-white border border-pink-100 p-6 shadow-sm hover:shadow-md transition" data-genero="{{ $p->fk_id_genero }}" data-codigo="{{ strtolower($p->codigo_barras) }}">
+            <div class="flex items-start gap-4">
+                
+                @if($p->imagen_url)
+    <img src="{{ $p->imagen_url }}" alt="{{ $p->nombre_prend }}" class="w-24 h-24 object-cover rounded-2xl border border-slate-100">
+@else
+    <img src="{{ asset('images/default.png') }}" alt="Sin imagen" class="w-24 h-24 object-cover rounded-2xl border border-slate-100">
+@endif
 
+                <div class="flex-1">
+                    <div class="flex items-center justify-between gap-4">
+                        <div>
+                            <h3 class="text-lg font-semibold text-slate-900">{{ $p->nombre_prend }}</h3>
+                            <p class="text-xs text-slate-400">Código: {{ $p->codigo_barras ?? 'No asignado' }}</p>
+                        </div>
+                        <span class="text-lg font-bold text-pink-500">${{ number_format($p->precio, 0, ',', '.') }}</span>
+                    </div>
+                    <div class="mt-4 grid grid-cols-2 gap-2">
+                        <div class="rounded-2xl bg-pink-50/60 p-2 text-xs text-center text-slate-700">Stock: {{ $p->stock }}</div>
+                        <div class="rounded-2xl bg-pink-50/60 p-2 text-xs text-center text-slate-700">Talla: {{ $p->talla_prend }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-5 flex items-center justify-between">
+                <span class="rounded-full px-3 py-1 text-xs font-semibold {{ $p->estado == 1 ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500' }}">
+                    {{ $p->estado == 1 ? 'Activo' : 'Inactivo' }}
+                </span>
+                <div class="flex gap-2">
+                    <button
+                        onclick="abrirModalEditar(
+                            '{{ $p->codigo_barras }}',
+                            '{{ addslashes($p->nombre_prend) }}',
+                            '{{ addslashes($p->descripcion_prend) }}',
+                            {{ $p->precio }},
+                            {{ $p->stock }},
+                            {{ $p->min_stock }},
+                            {{ $p->max_stock }},
+                            {{ $p->fk_id_genero }},
+                            {{ $p->fk_idt_prendas }},
+                            {{ $p->fk_id_color }},
+                            {{ $p->estado }}
+                        )"
+                        class="rounded-2xl bg-pink-100 px-4 py-2 text-xs font-semibold text-pink-600 hover:bg-pink-200 transition">
+                        Editar
+                    </button>
+                    <form action="{{ route('prenda.destroy', $p->codigo_barras) }}" method="POST" class="inline">
+                        @csrf @method('DELETE')
+                        <button type="submit" onclick="return confirm('¿Eliminar prenda?')" class="rounded-2xl bg-slate-100 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-200 transition">Eliminar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        @endforeach
+    </div>
+</section>
                 {{-- ===== SECCIÓN: FACTURAS ===== --}}
                 <section id="facturas" class="mb-8 {{ $activeSection !== 'facturas' ? 'hidden' : '' }}">
                     <div class="rounded-3xl bg-white border border-pink-100 p-6 shadow-sm">
@@ -435,7 +466,7 @@
                     </div>
                 </section>
 
-                {{-- ===== SECCIÓN: MOVIMIENTOS ===== --}}
+                <!-- {{-- ===== SECCIÓN: MOVIMIENTOS ===== --}}
                 <section id="movimientos" class="mb-8 {{ $activeSection !== 'movimientos' ? 'hidden' : '' }}">
                     <div class="rounded-3xl bg-white border border-pink-100 p-6 shadow-sm">
                         <div class="mb-6">
@@ -465,7 +496,7 @@
                             </table>
                         </div>
                     </div>
-                </section>
+                </section> -->
 
                 {{-- ===== SECCIÓN: USUARIOS ===== --}}
                 <section id="usuarios" class="mb-8 {{ $activeSection !== 'usuarios' ? 'hidden' : '' }}">
@@ -479,9 +510,21 @@
                                 <i class="fa-solid fa-user-plus"></i> Registrar Usuario
                             </button>
                         </div>
+                        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
+                            <div class="space-y-2 w-full sm:w-auto">
+                                <label for="userRoleFilter" class="block text-xs font-bold uppercase tracking-wider text-slate-500">Filtrar por rol</label>
+                                <select id="userRoleFilter" class="w-full rounded-2xl border border-pink-100 bg-white px-4 py-3 text-sm text-slate-700 outline-none focus:border-pink-300 focus:ring-2 focus:ring-pink-100 transition">
+                                    <option value="">Todos los roles</option>
+                                    @foreach($roles as $role)
+                                        <option value="{{ strtolower($role->nom_rol) }}">{{ ucfirst($role->nom_rol) }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div id="userNoResults" class="hidden rounded-2xl bg-rose-50 border border-rose-100 p-4 text-sm font-semibold text-rose-700">No se encontró ningún usuario con ese rol.</div>
+                        </div>
                         <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                             @foreach($usuarios as $user)
-                            <div id="user-card-{{ $user->id_usuario }}" onclick="if (event.target.closest('button')) return; abrirUsuarioModal({{ $user->id_usuario }})" class="p-5 border border-pink-100 rounded-3xl bg-white shadow-sm flex flex-col justify-between cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-transform">
+                            <div id="user-card-{{ $user->id_usuario }}" data-role="{{ strtolower($user->role ?? 'cliente') }}" onclick="if (event.target.closest('button')) return; abrirUsuarioModal({{ $user->id_usuario }})" class="p-5 border border-pink-100 rounded-3xl bg-white shadow-sm flex flex-col justify-between cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-transform">
                                 <div>
                                     <div class="flex items-center gap-3 mb-3">
                                         <div class="w-10 h-10 rounded-full bg-pink-100 text-pink-600 flex items-center justify-center font-bold">
@@ -842,6 +885,30 @@
         toggleModal('deleteUserModal');
     }
 
+    function filtrarUsuariosPorRol() {
+        const roleFilter = document.getElementById('userRoleFilter');
+        const noResults = document.getElementById('userNoResults');
+        const roleValue = roleFilter ? roleFilter.value.toLowerCase() : '';
+        const cards = document.querySelectorAll('#usuarios [data-role]');
+        let visible = 0;
+
+        cards.forEach((card) => {
+            const cardRole = card.dataset.role || '';
+            const matches = !roleValue || cardRole === roleValue;
+            card.classList.toggle('hidden', !matches);
+            if (matches) visible += 1;
+        });
+
+        if (noResults) {
+            noResults.classList.toggle('hidden', visible > 0);
+        }
+    }
+
+    const userRoleFilterEl = document.getElementById('userRoleFilter');
+    if (userRoleFilterEl) {
+        userRoleFilterEl.addEventListener('change', filtrarUsuariosPorRol);
+    }
+
     // Rellenar y abrir modal de edición
     function abrirModalEditar(codigo, nombre, descripcion, precio, stock, min_stock, max_stock, genero, talla, color, estado) {
         document.getElementById('edit_codigo_barras').value    = codigo;
@@ -891,6 +958,9 @@
     // FIX: Se lee data.message del JSON en vez de mostrar un mensaje genérico.
     // FIX: encodeURIComponent() protege códigos con caracteres especiales en la URL.
     let debounceTimer = null;
+    let carritoVenta = [];
+    let prendaVentaTemporal = null;
+
     document.getElementById('codigo_barras_venta').addEventListener('input', function(e) {
         const codigo = e.target.value.trim();
         const statusLabel = document.getElementById('searchStatusVentas');
@@ -914,18 +984,15 @@
 
                     if (data.success) {
                         const prenda = data.prenda;
+                        prendaVentaTemporal = prenda;
 
                         document.getElementById('nombre_prend_venta').value      = prenda.nombre_prend;
                         document.getElementById('detalles_prend_venta').value    = `Talla: ${prenda.talla_prend ?? 'N/A'} | Color: ${prenda.nom_color ?? 'N/A'}`;
                         document.getElementById('precio_unitario_venta').value   = prenda.precio;
                         document.getElementById('stock_disponible_venta').value  = `${prenda.stock} unidades`;
-                        // Campos ocultos que se envían al backend
-                        document.getElementById('hidden_codigo_barras').value   = prenda.codigo_barras;
-                        document.getElementById('hidden_precio_unitario').value = prenda.precio;
 
                         const cantidadInput = document.getElementById('cantidad_vendida_venta');
                         cantidadInput.disabled = false;
-
                         const tipoProceso = document.getElementById('tipo_proceso').value;
                         if (tipoProceso === 'venta' || tipoProceso === 'apartado') {
                             cantidadInput.max = prenda.stock;
@@ -933,11 +1000,15 @@
                             cantidadInput.removeAttribute('max');
                         }
                         cantidadInput.value = 1;
-                        const btn = document.getElementById('btnSubmitVenta');
-                        btn.disabled = false;
-                        btn.className = "w-full sm:w-auto bg-pink-500 hover:bg-pink-600 text-white font-bold text-sm px-8 py-3.5 rounded-2xl transition shadow-lg shadow-pink-500/20 flex items-center justify-center gap-2 cursor-pointer";
+
+                        const btnAdd = document.getElementById('btnAgregarAlCarrito');
+                        if (btnAdd) {
+                            btnAdd.disabled = false;
+                            btnAdd.className = "w-full sm:w-auto bg-pink-500 hover:bg-pink-600 text-white font-bold text-sm px-8 py-3.5 rounded-2xl transition shadow-lg shadow-pink-500/20 flex items-center justify-center gap-2 cursor-pointer";
+                        }
+
                         calcularTotalesVenta();
-                        showFeedbackVentas('Prenda cargada con éxito.', 'emerald');
+                        showFeedbackVentas('Prenda lista para agregar al carrito.', 'emerald');
                     } else {
                         resetFormularioVenta();
                         showFeedbackVentas(data.message || 'Código no registrado o inactivo.', 'rose');
@@ -956,7 +1027,161 @@
         if (document.getElementById('nombre_prend_venta').value !== '') {
             calcularTotalesVenta();
         }
+        actualizarTotalesCarritoVenta();
     });
+
+    const btnAgregarCarrito = document.getElementById('btnAgregarAlCarrito');
+    if (btnAgregarCarrito) {
+        btnAgregarCarrito.addEventListener('click', function() {
+            if (!prendaVentaTemporal) return;
+            const cantidadInput = document.getElementById('cantidad_vendida_venta');
+            let cantidad = parseInt(cantidadInput.value, 10) || 1;
+            if (cantidad < 1) cantidad = 1;
+
+            const tipoProceso = document.getElementById('tipo_proceso').value;
+            const stock = prendaVentaTemporal.stock;
+            const existente = carritoVenta.find(item => item.codigo_barras === prendaVentaTemporal.codigo_barras);
+            if (tipoProceso !== 'devolucion' && existente) {
+                if (existente.cantidad + cantidad > stock) {
+                    showFeedbackVentas('No puedes añadir más unidades que las disponibles en stock.', 'amber');
+                    return;
+                }
+            }
+
+            if (tipoProceso !== 'devolucion' && cantidad > stock) {
+                showFeedbackVentas('La cantidad excede el stock disponible.', 'amber');
+                return;
+            }
+
+            if (existente) {
+                existente.cantidad += cantidad;
+            } else {
+                carritoVenta.push({
+                    codigo_barras: prendaVentaTemporal.codigo_barras,
+                    nombre_prend: prendaVentaTemporal.nombre_prend,
+                    precio: parseInt(prendaVentaTemporal.precio, 10) || 0,
+                    cantidad: cantidad,
+                    max: tipoProceso === 'devolucion' ? null : prendaVentaTemporal.stock
+                });
+            }
+
+            renderizarCarritoVenta();
+            resetFormularioVenta();
+            validarFormularioVenta();
+            showFeedbackVentas('Prenda agregada al carrito correctamente.', 'emerald');
+        });
+    }
+
+    function renderizarCarritoVenta() {
+        const tbody = document.getElementById('ventaCarritoBody');
+        const cartEmptyRow = document.getElementById('ventaCarritoVacio');
+        tbody.innerHTML = '';
+
+        if (carritoVenta.length === 0) {
+            tbody.innerHTML = `
+                <tr id="ventaCarritoVacio">
+                    <td colspan="5" class="p-8 text-center text-slate-400 font-medium">No hay prendas agregadas al carrito.</td>
+                </tr>`;
+            actualizarTotalesCarritoVenta();
+            return;
+        }
+
+        carritoVenta.forEach((item, index) => {
+            const subtotal = item.precio * item.cantidad;
+            const row = document.createElement('tr');
+            row.className = 'hover:bg-pink-50/50 transition';
+            row.innerHTML = `
+                <td class="p-4 font-medium text-slate-800">
+                    <div>${item.nombre_prend}</div>
+                    <div class="text-xs text-slate-400 font-mono">${item.codigo_barras}</div>
+                </td>
+                <td class="p-4 text-center">
+                    <input type="number" min="1" value="${item.cantidad}" ${item.max ? `max="${item.max}"` : ''} onchange="actualizarCantidadCarrito(${index}, this.value)" class="w-20 rounded-xl border border-slate-200 text-center text-sm text-slate-800" />
+                </td>
+                <td class="p-4 text-right font-mono text-slate-500">${new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(item.precio)}</td>
+                <td class="p-4 text-right font-mono font-bold text-slate-900">${new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(subtotal)}</td>
+                <td class="p-4 text-center">
+                    <button type="button" onclick="eliminarDelCarritoVenta(${index})" class="text-rose-500 hover:text-rose-700 p-2 transition">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                </td>`;
+            tbody.appendChild(row);
+        });
+
+        actualizarTotalesCarritoVenta();
+    }
+
+    function actualizarCantidadCarrito(index, newQty) {
+        newQty = parseInt(newQty, 10) || 1;
+        const item = carritoVenta[index];
+        if (!item) return;
+        if (item.max && newQty > item.max) {
+            newQty = item.max;
+        }
+        if (newQty < 1) newQty = 1;
+        item.cantidad = newQty;
+        renderizarCarritoVenta();
+    }
+
+    function eliminarDelCarritoVenta(index) {
+        carritoVenta.splice(index, 1);
+        renderizarCarritoVenta();
+    }
+
+    function actualizarTotalesCarritoVenta() {
+        const tipoProceso = document.getElementById('tipo_proceso').value;
+        let total = carritoVenta.reduce((sum, item) => sum + item.precio * item.cantidad, 0);
+        if (tipoProceso === 'devolucion') {
+            total = total * -1;
+        }
+
+        const formatter = new Intl.NumberFormat('es-CO', {
+            style: 'currency',
+            currency: 'COP',
+            minimumFractionDigits: 0
+        });
+
+        document.getElementById('resumen_subtotal_venta').innerText = formatter.format(Math.abs(total));
+        document.getElementById('resumen_total_venta').innerText = formatter.format(total);
+        document.getElementById('carrito_items_hidden').value = JSON.stringify(carritoVenta);
+        validarFormularioVenta();
+    }
+
+    function validarFormularioVenta() {
+        const btn = document.getElementById('btnSubmitVenta');
+        if (!btn) return;
+        if (carritoVenta.length > 0) {
+            btn.disabled = false;
+            btn.className = "w-full sm:w-auto bg-pink-500 hover:bg-pink-600 text-white font-bold text-sm px-8 py-3.5 rounded-2xl transition flex items-center justify-center gap-2 cursor-pointer";
+        } else {
+            btn.disabled = true;
+            btn.className = "w-full sm:w-auto bg-slate-200 text-slate-400 font-bold text-sm px-8 py-3.5 rounded-2xl transition flex items-center justify-center gap-2 cursor-not-allowed";
+        }
+    }
+
+    function resetFormularioVenta() {
+        prendaVentaTemporal = null;
+        document.getElementById('codigo_barras_venta').value = '';
+        document.getElementById('nombre_prend_venta').value     = '';
+        document.getElementById('detalles_prend_venta').value   = '';
+        document.getElementById('precio_unitario_venta').value  = '';
+        document.getElementById('stock_disponible_venta').value = '';
+
+        const cantidadInput = document.getElementById('cantidad_vendida_venta');
+        cantidadInput.disabled = true;
+        cantidadInput.value = 1;
+        cantidadInput.removeAttribute('max');
+
+        const btn = document.getElementById('btnAgregarAlCarrito');
+        if (btn) {
+            btn.disabled = true;
+            btn.className = "w-full sm:w-auto bg-slate-200 text-slate-400 font-bold text-sm px-8 py-3.5 rounded-2xl transition flex items-center justify-center gap-2 cursor-not-allowed";
+        }
+
+        document.getElementById('resumen_subtotal_venta').innerText = '$0';
+        document.getElementById('resumen_total_venta').innerText    = '$0';
+    }
+
     function calcularTotalesVenta() {
         const precio    = parseFloat(document.getElementById('precio_unitario_venta').value) || 0;
         const cantidad  = parseInt(document.getElementById('cantidad_vendida_venta').value) || 1;
@@ -984,12 +1209,11 @@
         cantidadInput.disabled = true;
         cantidadInput.value = 1;
 
-        const btn = document.getElementById('btnSubmitVenta');
-        btn.disabled = true;
-        btn.className = "w-full sm:w-auto bg-slate-200 text-slate-400 font-bold text-sm px-8 py-3.5 rounded-2xl transition flex items-center justify-center gap-2 cursor-not-allowed";
-
-        document.getElementById('resumen_subtotal_venta').innerText = '$0';
-        document.getElementById('resumen_total_venta').innerText    = '$0';
+        const btn = document.getElementById('btnAgregarAlCarrito');
+        if (btn) {
+            btn.disabled = true;
+            btn.className = "w-full sm:w-auto bg-slate-200 text-slate-400 font-bold text-sm px-8 py-3.5 rounded-2xl transition flex items-center justify-center gap-2 cursor-not-allowed";
+        }
     }
 
     function showFeedbackVentas(msg, color) {
@@ -1003,6 +1227,21 @@
     document.getElementById('btnAlertaStock').addEventListener('click', function() {
         alert('📢 Notificación de stock crítico enviada de forma interna al perfil del Administrador.');
     });
+
+    // Limpiar carrito después de enviar el formulario de ventas
+    const formTransaccion = document.getElementById('formTransaccion');
+    if (formTransaccion) {
+        formTransaccion.addEventListener('submit', function(e) {
+            // Permitir el submit normal
+            // Después de que se envíe, limpiar el carrito para la siguiente operación
+            setTimeout(() => {
+                carritoVenta = [];
+                renderizarCarritoVenta();
+                actualizarTotalesCarritoVenta();
+            }, 500);
+        });
+    }
+
     const codigoCrearEl = document.getElementById('codigo_barras_crear');
     if (codigoCrearEl) {
         codigoCrearEl.addEventListener('input', function() {
@@ -1039,6 +1278,42 @@
                 })
                 .catch(err => console.error("Error al validar código:", err));
         });
+    }
+
+    const inventoryBarcodeSearch = document.getElementById('inventoryBarcodeSearch');
+    const inventoryGeneroFilter = document.getElementById('inventoryGeneroFilter');
+    const inventoryNoResults = document.getElementById('inventoryNoResults');
+    const inventoryCards = document.querySelectorAll('#inventario .product-card');
+
+    function filtrarInventario() {
+        const query = inventoryBarcodeSearch ? inventoryBarcodeSearch.value.trim().toLowerCase() : '';
+        const genero = inventoryGeneroFilter ? inventoryGeneroFilter.value : '';
+        let visibleCount = 0;
+
+        inventoryCards.forEach((card) => {
+            const cardGenero = card.dataset.genero || '';
+            const cardCodigo = card.dataset.codigo || '';
+            const matchesGenero = !genero || cardGenero === genero;
+            const matchesCodigo = !query || cardCodigo.includes(query);
+
+            if (matchesGenero && matchesCodigo) {
+                card.classList.remove('hidden');
+                visibleCount += 1;
+            } else {
+                card.classList.add('hidden');
+            }
+        });
+
+        if (inventoryNoResults) {
+            inventoryNoResults.classList.toggle('hidden', visibleCount > 0);
+        }
+    }
+
+    if (inventoryBarcodeSearch) {
+        inventoryBarcodeSearch.addEventListener('input', filtrarInventario);
+    }
+    if (inventoryGeneroFilter) {
+        inventoryGeneroFilter.addEventListener('change', filtrarInventario);
     }
 
 // ===================== Usuarios: abrir modal y actualizar =====================
@@ -1173,6 +1448,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 pwdInput.type = 'password';
                 toggleBtn.innerHTML = '<i class="fa-solid fa-eye"></i>';
                 toggleBtn.setAttribute('aria-pressed', 'false');
+            }
+        });
+    }
+
+    // Activar la sección correcta basada en el parámetro URL al cargar
+    const urlParams = new URLSearchParams(window.location.search);
+    const sectionParam = urlParams.get('section');
+    if (sectionParam) {
+        activateDashboardTab(sectionParam);
+        // Actualizar el sidebar para mostrar la sección activa
+        document.querySelectorAll('.sidebar-link').forEach((link) => {
+            if (link.dataset.section === sectionParam) {
+                link.classList.remove('text-slate-600');
+                link.classList.add('active-link', 'bg-pink-500/10', 'border', 'border-pink-100', 'text-pink-600', 'shadow-sm');
+            } else {
+                link.classList.remove('active-link', 'bg-pink-500/10', 'border-pink-100', 'text-pink-600', 'shadow-sm');
+                link.classList.add('text-slate-600');
             }
         });
     }
