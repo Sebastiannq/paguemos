@@ -62,6 +62,11 @@ Route::post('/empleado/apartados/guardar', [ProductoController::class, 'storeApa
     Route::post('/dashboard/venta', [VentaController::class, 'store'])->name('venta.store');
     Route::get('/dashboard/ventas', [VentaController::class, 'index'])->name('dashboard.ventas');
 
+    // Reportes PDF
+    Route::get('/dashboard/report/ventas', [ProductoController::class, 'reportVentas'])->name('dashboard.report.ventas');
+    Route::get('/dashboard/report/inventario', [ProductoController::class, 'reportInventario'])->name('dashboard.report.inventario');
+    Route::get('/dashboard/report/usuarios', [ProductoController::class, 'reportUsuarios'])->name('dashboard.report.usuarios');
+
     // Facturas
     Route::get('/dashboard/facturas', [FacturaController::class, 'indexAdmin'])->name('dashboard.facturas');
     Route::get('/dashboard/facturas/{id}', [FacturaController::class, 'showAdmin'])->name('dashboard.facturas.show');

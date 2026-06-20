@@ -187,6 +187,19 @@
                             <canvas id="topPrendasDonut" height="320"></canvas>
                         </div>
                     </div>
+
+                    <div class="rounded-3xl bg-white border border-pink-100 p-6 shadow-sm">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
+                            <div>
+                                <p class="text-xs uppercase tracking-[0.35em] text-pink-500">Ventas Diarias</p>
+                                <p class="mt-1 text-sm text-slate-500">Movimiento de ventas a lo largo de junio 2026.</p>
+                            </div>
+                            <span class="text-xs font-semibold text-slate-400">Junio 2026</span>
+                        </div>
+                        <div class="relative">
+                            <canvas id="ventasDiariasBarras" height="150"></canvas>
+                        </div>
+                    </div>
                 </section>
 
                 {{-- ===== SECCIÓN: VENTAS ===== --}}
@@ -203,9 +216,14 @@
                                         <p class="text-xs text-slate-400 font-medium">Facturación fluida para prendas y calzado.</p>
                                     </div>
                                 </div>
-                                <button type="button" id="btnAlertaStock" class="inline-flex items-center gap-2 text-xs font-bold text-amber-600 bg-amber-50 border border-amber-200 px-4 py-2 rounded-2xl hover:bg-amber-100 transition">
-                                    <i class="fa-solid fa-triangle-exclamation"></i> Avisar Admin sobre Bajo Stock
-                                </button>
+                                <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                                    <a href="{{ route('dashboard.report.ventas') }}" class="inline-flex items-center gap-2 text-xs font-bold text-white bg-pink-500 px-4 py-2 rounded-2xl hover:bg-pink-600 transition">
+                                        <i class="fa-solid fa-file-pdf"></i> Generar Reporte
+                                    </a>
+                                    <button type="button" id="btnAlertaStock" class="inline-flex items-center gap-2 text-xs font-bold text-amber-600 bg-amber-50 border border-amber-200 px-4 py-2 rounded-2xl hover:bg-amber-100 transition">
+                                        <i class="fa-solid fa-triangle-exclamation"></i> Avisar Admin sobre Bajo Stock
+                                    </button>
+                                </div>
                             </div>
 
                             <form action="{{ route('venta.store') }}" method="POST" id="formTransaccion" class="space-y-6">
@@ -390,10 +408,14 @@
         <div>
             <h2 class="text-2xl font-bold text-slate-900">Catálogo / Inventario</h2>
         </div>
-        {{-- CORRECCIÓN: el id del modal debe existir en el DOM --}}
-        <button onclick="toggleModal('createModal')" class="inline-flex items-center gap-2 rounded-3xl bg-pink-500 px-5 py-3 text-sm font-semibold text-white hover:bg-pink-600 transition">
-            <i class="fa-solid fa-plus"></i> Agregar Prenda
-        </button>
+        <div class="flex flex-col sm:flex-row gap-3">
+            <a href="{{ route('dashboard.report.inventario') }}" class="inline-flex items-center gap-2 rounded-3xl bg-pink-500 px-5 py-3 text-sm font-semibold text-white hover:bg-pink-600 transition">
+                <i class="fa-solid fa-file-pdf"></i> Generar Reporte
+            </a>
+            <button onclick="toggleModal('createModal')" class="inline-flex items-center gap-2 rounded-3xl bg-pink-500 px-5 py-3 text-sm font-semibold text-white hover:bg-pink-600 transition">
+                <i class="fa-solid fa-plus"></i> Agregar Prenda
+            </button>
+        </div>
     </div>
     <div class="grid gap-4 lg:grid-cols-[1fr_auto] items-end mb-6">
         <div class="space-y-2">
@@ -519,9 +541,14 @@
                                 <h2 class="text-2xl font-bold text-slate-900">Cuentas y Usuarios</h2>
                                 <p class="text-xs text-slate-400 mt-1">Lista completa de personal administrador, staff y clientes registrados.</p>
                             </div>
-                            <button onclick="toggleModal('createUserModal')" class="inline-flex items-center gap-2 rounded-3xl bg-pink-500 px-4 py-3 text-sm font-semibold text-white hover:bg-pink-600 transition">
-                                <i class="fa-solid fa-user-plus"></i> Registrar Usuario
-                            </button>
+                            <div class="flex flex-col sm:flex-row gap-3">
+                                <a href="{{ route('dashboard.report.usuarios') }}" class="inline-flex items-center gap-2 rounded-3xl bg-pink-500 px-4 py-3 text-sm font-semibold text-white hover:bg-pink-600 transition">
+                                    <i class="fa-solid fa-file-pdf"></i> Generar Reporte
+                                </a>
+                                <button onclick="toggleModal('createUserModal')" class="inline-flex items-center gap-2 rounded-3xl bg-pink-500 px-4 py-3 text-sm font-semibold text-white hover:bg-pink-600 transition">
+                                    <i class="fa-solid fa-user-plus"></i> Registrar Usuario
+                                </button>
+                            </div>
                         </div>
                         <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
                             <div class="space-y-2 w-full sm:w-auto">
@@ -1565,6 +1592,82 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    function inicializarGraficoVentasDiarias() {
+        const ctx = document.getElementById('ventasDiariasBarras');
+        if (!ctx) return;
+
+        const diasJunio = @json($diasJunio);
+        const labels = diasJunio.map(d => `Día ${d.dia}`);
+        const data = diasJunio.map(d => d.total);
+        
+        const colores = [
+            '#EC4899', '#F97316', '#14B8A6', '#6366F1', '#EAB308', '#A855F7',
+            '#06B6D4', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#F97316',
+            '#14B8A6', '#6366F1', '#EAB308', '#A855F7', '#06B6D4', '#10B981',
+            '#F59E0B', '#8B5CF6', '#EC4899', '#F97316', '#14B8A6', '#6366F1',
+            '#EAB308', '#A855F7', '#06B6D4', '#10B981', '#F59E0B', '#8B5CF6'
+        ];
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Ventas ($)',
+                    data: data,
+                    backgroundColor: colores,
+                    borderColor: colores.map(c => c.replace('EC4899', 'DB2777').replace('F97316', 'D14315').replace('14B8A6', '0F766E')),
+                    borderWidth: 1,
+                    borderRadius: 8,
+                    barPercentage: 0.8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'x',
+                plugins: {
+                    legend: {
+                        display: false,
+                        labels: {
+                            color: '#334155',
+                            padding: 16
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `Total: $${Number(context.parsed.y).toLocaleString('es-CO')}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            color: '#94A3B8',
+                            callback: function(value) {
+                                return '$' + Number(value).toLocaleString('es-CO');
+                            }
+                        },
+                        grid: {
+                            color: '#F1F5F9'
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: '#94A3B8'
+                        },
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    }
+
     // Activar la sección correcta basada en el parámetro URL al cargar
     const urlParams = new URLSearchParams(window.location.search);
     const sectionParam = urlParams.get('section');
@@ -1583,6 +1686,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     inicializarGraficoTopPrendas();
+    inicializarGraficoVentasDiarias();
 });
 </script>
 @endsection

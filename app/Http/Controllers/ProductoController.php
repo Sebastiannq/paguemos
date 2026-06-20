@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Prenda;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -66,12 +68,103 @@ class ProductoController extends Controller
             ->orderBy('usuario.id_usuario', 'asc')
             ->get();
 
+        // Ventas diarias de junio 2026
+        $ventasDiarias = DB::table('venta')
+            ->selectRaw('DATE(fecha_venta) as fecha, SUM(total) as total_dia')
+            ->whereYear('fecha_venta', 2026)
+            ->whereMonth('fecha_venta', 6)
+            ->groupByRaw('DATE(fecha_venta)')
+            ->orderBy('fecha')
+            ->get();
+
+        // Crear array con todos los días de junio (1-30)
+        $diasJunio = collect();
+        for ($i = 1; $i <= 30; $i++) {
+            $fecha = '2026-06-' . str_pad($i, 2, '0', STR_PAD_LEFT);
+            $venta = $ventasDiarias->firstWhere('fecha', $fecha);
+            $diasJunio->push([
+                'dia' => $i,
+                'total' => $venta ? $venta->total_dia : 0
+            ]);
+        }
+
         $roles   = DB::table('rol')->orderBy('nom_rol')->get();
         $generos = DB::table('genero_prend')->get();
         $tallas  = DB::table('t_prendas')->get();
         $colores = DB::table('Color')->get();
 
-        return view('dashboard.staff', compact('prendas', 'ventas', 'usuarios', 'roles', 'generos', 'tallas', 'colores', 'totalVentas', 'topPrendasVendidas'));
+        return view('dashboard.staff', compact('prendas', 'ventas', 'usuarios', 'roles', 'generos', 'tallas', 'colores', 'totalVentas', 'topPrendasVendidas', 'diasJunio'));
+    }
+
+    public function reportVentas()
+    {
+        $ventas = DB::table('venta')
+            ->orderBy('fecha_venta', 'desc')
+            ->get();
+
+        $generatedAt = now()->format('d/m/Y H:i');
+        $html = view('reports.ventas', compact('ventas', 'generatedAt'))->render();
+
+        $options = new Options();
+        $options->set('defaultFont', 'Arial');
+        $dompdf = new Dompdf($options);
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+
+        return response($dompdf->output(), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="reporte_ventas_' . now()->format('Ymd_His') . '.pdf"',
+        ]);
+    }
+
+    public function reportInventario()
+    {
+        $prendas = DB::table('prenda')
+            ->join('genero_prend', 'prenda.fk_id_genero', '=', 'genero_prend.id_genero_prend')
+            ->select('prenda.nombre_prend', 'prenda.codigo_barras', 'prenda.stock', 'genero_prend.tipo_genero')
+            ->orderByDesc('prenda.stock')
+            ->get();
+
+        $generatedAt = now()->format('d/m/Y H:i');
+        $html = view('reports.inventario', compact('prendas', 'generatedAt'))->render();
+
+        $options = new Options();
+        $options->set('defaultFont', 'Arial');
+        $dompdf = new Dompdf($options);
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+
+        return response($dompdf->output(), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="reporte_inventario_' . now()->format('Ymd_His') . '.pdf"',
+        ]);
+    }
+
+    public function reportUsuarios()
+    {
+        $usuarios = DB::table('usuario')
+            ->leftJoin('usuario_rol', 'usuario.id_usuario', '=', 'usuario_rol.fkpk_id_usuario')
+            ->leftJoin('rol', 'usuario_rol.fkpk_id_rol', '=', 'rol.id_rol')
+            ->select('usuario.id_usuario', 'usuario.primer_nom', 'usuario.segund_nom', 'usuario.primer_apelli', 'usuario.segund_apelli', 'usuario.correo', 'usuario.estado', 'rol.nom_rol as role')
+            ->orderBy('usuario.id_usuario')
+            ->get();
+
+        $generatedAt = now()->format('d/m/Y H:i');
+        $html = view('reports.usuarios', compact('usuarios', 'generatedAt'))->render();
+
+        $options = new Options();
+        $options->set('defaultFont', 'Arial');
+        $dompdf = new Dompdf($options);
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+
+        return response($dompdf->output(), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="reporte_usuarios_' . now()->format('Ymd_His') . '.pdf"',
+        ]);
     }
 
     /**
