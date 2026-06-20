@@ -48,6 +48,16 @@ class ProductoController extends Controller
             });
 
         $ventas = DB::table('venta')->orderBy('fecha_venta', 'desc')->get();
+        $totalVentas = DB::table('venta')->sum('total');
+        $topPrendasVendidas = DB::table('venta_prenda')
+            ->join('venta', 'venta_prenda.fkpk_id_venta', '=', 'venta.id_venta')
+            ->join('prenda', 'venta_prenda.fkpk_codigo_barras', '=', 'prenda.codigo_barras')
+            ->select('prenda.nombre_prend', DB::raw('SUM(venta_prenda.cantidad_vendida) as total_vendida'))
+            ->whereYear('venta.fecha_venta', 2026)
+            ->groupBy('prenda.nombre_prend')
+            ->orderByDesc('total_vendida')
+            ->limit(6)
+            ->get();
         
         $usuarios = DB::table('usuario')
             ->leftJoin('usuario_rol', 'usuario.id_usuario', '=', 'usuario_rol.fkpk_id_usuario')
@@ -61,7 +71,7 @@ class ProductoController extends Controller
         $tallas  = DB::table('t_prendas')->get();
         $colores = DB::table('Color')->get();
 
-        return view('dashboard.staff', compact('prendas', 'ventas', 'usuarios', 'roles', 'generos', 'tallas', 'colores'));
+        return view('dashboard.staff', compact('prendas', 'ventas', 'usuarios', 'roles', 'generos', 'tallas', 'colores', 'totalVentas', 'topPrendasVendidas'));
     }
 
     /**
@@ -94,9 +104,9 @@ class ProductoController extends Controller
             'nombre_prend'      => 'required|string|max:25',
             'descripcion_prend' => 'required|string|max:35',
             'precio'            => 'required|integer|min:0',
-            'stock'             => 'required|integer|min:0|max:60',
-            'min_stock'         => 'required|integer|min:0',
-            'max_stock'         => 'required|integer|min:0',
+            'stock'             => 'required|integer|min:0|max:85',
+            'min_stock'         => 'required|integer|min:0|max:85',
+            'max_stock'         => 'required|integer|min:0|max:85',
             'fk_id_genero'      => 'required|integer',
             'fk_idt_prendas'    => 'required|integer',
             'fk_id_color'       => 'required|integer',
@@ -123,7 +133,9 @@ class ProductoController extends Controller
             'imagen_prend'   => $imagen,
         ]));
 
-        return redirect()->back()->with('success', 'Prenda agregada exitosamente.');
+        return redirect()->route('dashboard.staff')
+            ->with('success', 'Prenda agregada exitosamente.')
+            ->with('active_section', 'inventario');
     }
 
     /**
@@ -138,9 +150,9 @@ class ProductoController extends Controller
             'nombre_prend'      => 'required|string|max:25',
             'descripcion_prend' => 'required|string|max:35',
             'precio'            => 'required|integer|min:0',
-            'stock'             => 'required|integer|min:0|max:60',
-            'min_stock'         => 'required|integer|min:0',
-            'max_stock'         => 'required|integer|min:0',
+            'stock'             => 'required|integer|min:0|max:85',
+            'min_stock'         => 'required|integer|min:0|max:85',
+            'max_stock'         => 'required|integer|min:0|max:85',
             'fk_id_genero'      => 'required|integer',
             'fk_idt_prendas'    => 'required|integer',
             'fk_id_color'       => 'required|integer',
@@ -175,7 +187,9 @@ class ProductoController extends Controller
     {
         $prenda = Prenda::findOrFail($codigo_barras);
         $prenda->delete();
-        return redirect()->back()->with('success', 'Prenda eliminada.');
+        return redirect()->route('dashboard.staff')
+            ->with('success', 'Prenda eliminada.')
+            ->with('active_section', 'inventario');
     }
 
     /**
@@ -337,10 +351,13 @@ class ProductoController extends Controller
         }
     }
 
-    /** * Endpoint exclusivo para registrar prendas desde la App Móvil Android (Volley)
+/** * Endpoint exclusivo para registrar prendas desde la App Móvil Android (Volley)
      */
     public function registrarPrendaDesdeAndroid(Request $request)
     {
+        // 🌟 LOG PREVENTIVO: Guarda en el log lo que está llegando de Android para auditoría
+        \Log::info('Datos recibidos desde Android:', $request->all());
+
         $validator = Validator::make($request->all(), [
             'codigo_barras'      => 'required|string|max:50',
             'nombre_prend'       => 'required|string|max:25',
@@ -349,7 +366,9 @@ class ProductoController extends Controller
             'stock'              => 'required|numeric',
             'min_stock'          => 'required|numeric',
             'max_stock'          => 'required|numeric',
-            'fk_id_genero_prend' => 'required|numeric',
+            // 🌟 SOLUCCIÓN: Validamos cualquiera de las dos variantes que envíe Android
+            'fk_id_genero_prend' => 'required_without:fk_id_genero|numeric',
+            'fk_id_genero'       => 'required_without:fk_id_genero_prend|numeric',
             'fk_idt_prendas'     => 'required|numeric',
             'fk_id_color'        => 'required|numeric',
         ]);
@@ -358,7 +377,7 @@ class ProductoController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error de validación en los datos',
-                'errors'  => $validator->errors()
+                'errors'  => $validator->errors() // Devuelve detalladamente qué campo faltó
             ], 400);
         }
 
@@ -374,6 +393,9 @@ class ProductoController extends Controller
                 file_put_contents($carpeta . $nombreImagen, $imageData);
             }
 
+            // Capturamos el ID del género sin importar cuál de las dos keys usó Kotlin
+            $idGenero = $request->input('fk_id_genero_prend') ?? $request->input('fk_id_genero');
+
             DB::table('prenda')->insert([
                 'codigo_barras'      => trim($request->input('codigo_barras')),
                 'nombre_prend'       => trim($request->input('nombre_prend')),
@@ -382,7 +404,7 @@ class ProductoController extends Controller
                 'stock'              => (int) $request->input('stock'),
                 'min_stock'          => (int) $request->input('min_stock'),
                 'max_stock'          => (int) $request->input('max_stock'),
-                'fk_id_genero_prend' => (int) $request->input('fk_id_genero_prend'), 
+                'fk_id_genero'       => (int) $idGenero, // 🌟 Corregido para que use la columna real de tu BD
                 'fk_idt_prendas'     => (int) $request->input('fk_idt_prendas'),
                 'fk_id_color'        => (int) $request->input('fk_id_color'),
                 'estado'             => 1,

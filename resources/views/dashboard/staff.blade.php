@@ -15,6 +15,7 @@
         display: none !important;
     }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <div class="min-h-screen bg-white text-slate-900">
     <div class="flex h-screen overflow-hidden">
@@ -172,6 +173,18 @@
                         <div class="rounded-3xl bg-white border border-pink-100 p-6 shadow-sm">
                             <p class="text-xs uppercase tracking-[0.35em] text-pink-500">Prendas Activas</p>
                             <p class="mt-4 text-3xl font-bold text-slate-900">{{ $prendas->where('estado',1)->count() }}</p>
+                        </div>
+                    </div>
+                    <div class="rounded-3xl bg-white border border-pink-100 p-6 shadow-sm">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
+                            <div>
+                                <p class="text-xs uppercase tracking-[0.35em] text-pink-500">Prendas más vendidas</p>
+                                <p class="mt-1 text-sm text-slate-500">Top productos vendidos en 2026.</p>
+                            </div>
+                            <span class="text-xs font-semibold text-slate-400">Último lapso 2026</span>
+                        </div>
+                        <div class="relative">
+                            <canvas id="topPrendasDonut" height="320"></canvas>
                         </div>
                     </div>
                 </section>
@@ -586,7 +599,7 @@
                 </div>
                 <div class="relative">
                     <select id="new_user_role" name="role" required class="rounded-xl border px-3 py-2 w-full">
-                        <option value="">- Selecciona rol -</option>
+                        <option value="">Rol (Obligatorio)</option>
                         <option value="administrador">Administrador</option>
                         <option value="empleado">Empleado</option>
                         <option value="cliente">Cliente</option>
@@ -678,7 +691,7 @@
                 </div>
                 <div class="space-y-1">
                     <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Stock Inicial *</label>
-                    <input type="number" name="stock" required min="10" placeholder="10"
+                    <input type="number" name="stock" required min="10" max="85" placeholder="10" oninput="validarStockMaximo()"
                         class="w-full rounded-2xl border border-pink-100 bg-white px-4 py-3 text-sm font-mono text-slate-800 outline-none focus:border-pink-300 focus:ring-2 focus:ring-pink-100 transition" />
                 </div>
             </div>
@@ -686,14 +699,17 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div class="space-y-1">
                     <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Stock Mínimo *</label>
-                    <input type="number" name="min_stock" required min="15" placeholder="15"
+                    <input type="number" name="min_stock" required min="15" max="85" placeholder="15" oninput="validarStockMaximo()"
                         class="w-full rounded-2xl border border-pink-100 bg-white px-4 py-3 text-sm font-mono text-slate-800 outline-none focus:border-pink-300 focus:ring-2 focus:ring-pink-100 transition" />
                 </div>
                 <div class="space-y-1">
                     <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Stock Máximo *</label>
-                    <input type="number" name="max_stock" required min="20" placeholder="20"
+                    <input type="number" name="max_stock" required min="20" max="85" placeholder="20" oninput="validarStockMaximo()"
                         class="w-full rounded-2xl border border-pink-100 bg-white px-4 py-3 text-sm font-mono text-slate-800 outline-none focus:border-pink-300 focus:ring-2 focus:ring-pink-100 transition" />
                 </div>
+            </div>
+            <div id="stockLimitError" class="hidden mt-2 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700">
+                El límite de stock es 85 en inicial, mínimo y máximo.
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -792,7 +808,7 @@
                 </div>
                 <div class="space-y-1">
                     <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Stock *</label>
-                    <input type="number" id="edit_stock" name="stock" required min="10"
+                    <input type="number" id="edit_stock" name="stock" required min="10" max="85" oninput="validarStockMaximoEditar()"
                         class="w-full rounded-2xl border border-pink-100 bg-white px-4 py-3 text-sm font-mono text-slate-800 outline-none focus:border-pink-300 focus:ring-2 focus:ring-pink-100 transition" />
                 </div>
             </div>
@@ -800,14 +816,17 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div class="space-y-1">
                     <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Stock Mínimo *</label>
-                    <input type="number" id="edit_min_stock" name="min_stock" required min="15"
+                    <input type="number" id="edit_min_stock" name="min_stock" required min="15" max="85" oninput="validarStockMaximoEditar()"
                         class="w-full rounded-2xl border border-pink-100 bg-white px-4 py-3 text-sm font-mono text-slate-800 outline-none focus:border-pink-300 focus:ring-2 focus:ring-pink-100 transition" />
                 </div>
                 <div class="space-y-1">
                     <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Stock Máximo *</label>
-                    <input type="number" id="edit_max_stock" name="max_stock" required min="20"
+                    <input type="number" id="edit_max_stock" name="max_stock" required min="20" max="85" oninput="validarStockMaximoEditar()"
                         class="w-full rounded-2xl border border-pink-100 bg-white px-4 py-3 text-sm font-mono text-slate-800 outline-none focus:border-pink-300 focus:ring-2 focus:ring-pink-100 transition" />
                 </div>
+            </div>
+            <div id="stockLimitErrorEdit" class="hidden mt-2 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700">
+                El límite de stock es 85 en inicial, mínimo y máximo.
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -1452,6 +1471,100 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    function validarStockMaximo() {
+        const maxAllowed = 85;
+        const inputs = [
+            document.querySelector('input[name="stock"]'),
+            document.querySelector('input[name="min_stock"]'),
+            document.querySelector('input[name="max_stock"]')
+        ];
+        const errorBox = document.getElementById('stockLimitError');
+        let invalid = false;
+
+        inputs.forEach(input => {
+            if (input) {
+                const value = parseInt(input.value, 10);
+                if (!Number.isNaN(value) && value > maxAllowed) {
+                    invalid = true;
+                }
+            }
+        });
+
+        if (errorBox) {
+            errorBox.classList.toggle('hidden', !invalid);
+        }
+    }
+
+    function validarStockMaximoEditar() {
+        const maxAllowed = 85;
+        const inputs = [
+            document.getElementById('edit_stock'),
+            document.getElementById('edit_min_stock'),
+            document.getElementById('edit_max_stock')
+        ];
+        const errorBox = document.getElementById('stockLimitErrorEdit');
+        let invalid = false;
+
+        inputs.forEach(input => {
+            if (input) {
+                const value = parseInt(input.value, 10);
+                if (!Number.isNaN(value) && value > maxAllowed) {
+                    invalid = true;
+                }
+            }
+        });
+
+        if (errorBox) {
+            errorBox.classList.toggle('hidden', !invalid);
+        }
+    }
+
+    function inicializarGraficoTopPrendas() {
+        const ctx = document.getElementById('topPrendasDonut');
+        if (!ctx) return;
+
+        const labels = @json($topPrendasVendidas->pluck('nombre_prend'));
+        const data = @json($topPrendasVendidas->pluck('total_vendida'));
+        const colors = [
+            '#EC4899', '#F97316', '#14B8A6', '#6366F1', '#EAB308', '#A855F7'
+        ];
+
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: data,
+                    backgroundColor: colors.slice(0, labels.length),
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#334155',
+                            usePointStyle: true,
+                            padding: 16
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.parsed || 0;
+                                return `${label}: ${value} prendas`; 
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
     // Activar la sección correcta basada en el parámetro URL al cargar
     const urlParams = new URLSearchParams(window.location.search);
     const sectionParam = urlParams.get('section');
@@ -1468,6 +1581,8 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    inicializarGraficoTopPrendas();
 });
 </script>
 @endsection
