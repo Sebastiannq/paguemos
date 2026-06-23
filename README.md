@@ -1,58 +1,62 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# SISPAGUEMENOS - Sistema de Información para Ventas e Inventario
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+![Laravel](https://img.shields.io/badge/laravel-%23FF2D20.svg?style=for-the-badge&logo=laravel&logoColor=white)
+![Kotlin](https://img.shields.io/badge/kotlin-%237F52FF.svg?style=for-the-badge&logo=kotlin&logoColor=white)
+![MySQL](https://img.shields.io/badge/mysql-%2300f.svg?style=for-the-badge&logo=mysql&logoColor=white)
+![Android Studio](https://img.shields.io/badge/android%20studio-34b271?style=for-the-badge&logo=android-studio&logoColor=white)
 
-## About Laravel
+## Descripción del Proyecto
+**Pague Menos** es una solución integral diseñada para optimizar el control de inventario y ventas de una tienda de ropa. El sistema surge para resolver la problemática del control manual, evitando la pérdida de stock, la falta de sincronización entre bodega y punto de venta, y facilitando la toma de decisiones administrativas.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+El ecosistema cuenta con una **Plataforma Web (Administración)** y una **Aplicación Móvil (Gestión de Inventario)** que se comunican en tiempo real mediante una API REST.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+##  Características Principales
+- **Gestión de Inventario (CRUD):** Registro detallado de prendas con atributos de talla, color y género.
+- **App Móvil Nativa:** Registro de productos desde dispositivos móviles con captura de imágenes.
+- **Sincronización Real-Time:** Comunicación mediante API REST y formato JSON.
+- **Control de Acceso (RBAC):** Roles diferenciados para Administradores, Empleados y Clientes.
+- **Seguridad:** Autenticación de sesiones y encriptación de contraseñas (Bcrypt).
+- **Reportes:** Visualización de stock y movimientos de inventario.
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+##  Stack Tecnológico
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Backend & Web
+*   **Lenguaje:** PHP 8.x
+*   **Framework:** [Laravel](https://laravel.com/)
+*   **Base de Datos:** MySQL
+*   **Servidor Local:** Laragon
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+### Mobile
+*   **Lenguaje:** Kotlin
+*   **Entorno:** Android Studio
+*   **Comunicación:** Volley (Consumo de API REST)
+*   **Procesamiento de Imágenes:** Base64 encoding/decoding
 
-## Agentic Development
+---
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+##  Arquitectura de Comunicación (API REST)
+El sistema utiliza una arquitectura desacoplada donde la App Móvil consume servicios expuestos por Laravel:
 
-```bash
-composer require laravel/boost --dev
+| Método | Endpoint | Descripción |
+| :--- | :--- | :--- |
+| `GET` | `/api/prendas/parametros` | Obtiene listas de tallas, colores y géneros. |
+| `POST` | `/api/registrar-prenda` | Envía datos de una nueva prenda (incluye imagen en Base64). |
 
-php artisan boost:install
-```
+---
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+##  Instalación y Configuración
 
-## Contributing
+### Requisitos
+*   PHP >= 8.1
+*   Composer
+*   Laragon o XAMPP
+*   Android Studio (para la App)
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### Pasos (Backend)
+1. Clonar el repositorio:
+   ```bash
+   git clone [https://github.com/tu-usuario/sispaguemos.git](https://github.com/tu-usuario/sispaguemos.git)
